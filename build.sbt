@@ -11,4 +11,5 @@ libraryDependencies ++= Seq(
 play.Project.playScalaSettings
 requireJs += "main.js"
 
+
 requireJsShim += "main.js"
