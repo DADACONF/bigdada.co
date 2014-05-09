@@ -11,38 +11,41 @@ require([], function() {
     return 'rgba(' + r + "," + g + "," + b + "," + 255.0 + ")";
   }
 
-	function washUpAndWashDown(drawingContext, cWidth, cHeight, stripeWidth, intervalLength) {
+	function stripes(drawingContext, cWidth, cHeight, stripeWidth, rate) {
+		function updateY() {
+			increment = -increment;
+			x = (x + stripeWidth);
+			color = randColor();
+		}
 		var color = randColor();
 		var numStripes =  cWidth / stripeWidth;
 		var increment = 60;
-		var x0 = 0;
-		var y0 = 0;
-		function updateY() {
-			increment = -increment;
-			x0 = (x0 + stripeWidth) % cWidth;
-			color = randColor();
-		}
+		var x = 0;
+		var y = 0;
 
-		var intervalId = setInterval(function() {
-			washDown(drawingContext,
-								x0,
-								y0,
+		function draw(timestamp){
+			drawStripe(drawingContext,
+								x,
+								y,
 								stripeWidth,
 								increment,
 								color);
-			y0 += increment;
-			if(y0 < 0) {
-				y0 = 0;
+			y += increment;
+			if(y < 0) {
+				y = 0;
 				updateY();
-			} else if(y0 > cHeight) {
-				y0 = cHeight;
+			} else if(y > cHeight) {
+				y = cHeight;
 				updateY();
 			}
-		}, intervalLength);
-		return intervalId;
+			if(x <= cWidth) {
+				requestAnimationFrame(draw);
+			}
+		}
+		return draw;
 	}
 
-	function washDown(drawingContext, x, y, stripeWidth, increment, color) {
+	function drawStripe(drawingContext, x, y, stripeWidth, increment, color) {
 		drawingContext.fillStyle = color;
 		if(increment < 0) {
 			drawingContext.fillRect(x, y + increment, stripeWidth, Math.abs(increment));
@@ -82,23 +85,6 @@ require([], function() {
 		return draw;	
 	}
 
-	function bindToClick(element, intervals, drawFunction) {
-		element.click(function() {
-			if(intervals.length == 1) {
-				clearInterval(intervals.pop());
-			}
-			intervals.push(drawFunction());
-		});
-	}
-	
-	function stop(intervals) {
-		while(intervals.length > 0) {
-			console.log(intervals);
-			clearInterval(intervals.pop());
-		}
-	}
-
-
 	$(document).ready(function() {
 		var canvas = $("#screen").get(0);
   	var canvas2DContext = canvas.getContext("2d");
@@ -106,20 +92,17 @@ require([], function() {
   	var xLayers = width / 2;
   	var height = canvas.height;
   	var imageData = canvas2DContext.createImageData(width, height);
-  	var intervals = [];
 
   	$("#spiral-btn").click(function() {
-			var rate = 0.01;
+			var rate = 0.05;
 			var draw = spiralDrawing(canvas2DContext, xLayers, rate);
 	 		requestAnimationFrame(draw);
   	});
 
-  	bindToClick($("#wash-btn"), intervals, function(){
-  		return washUpAndWashDown(canvas2DContext, width, height, 11, 20);
+  	$("#wash-btn").click(function(){
+  		var draw = stripes(canvas2DContext, width, height, 11, 20);
+  		requestAnimationFrame(draw);
   	});
-
-  	$("#stop-btn").click(function(){
-  		stop(intervals);
-  	});
+  	
 	});
 });
