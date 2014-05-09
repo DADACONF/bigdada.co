@@ -64,6 +64,24 @@ require([], function() {
 			drawingContext.fillRect(x1, y0, 1, length);
 	}
 
+	function spiralDrawing(canvas2DContext, layers, rate) {
+		var last = null;
+		var layer = 0;
+		function draw(timestamp) {
+			if(last === null) last = timestamp;
+			var layersDelta = (timestamp - last) * rate;
+			for(l = layer; l < layer + layersDelta; l++) {
+				drawLayer(canvas2DContext, l, layers, randColor());
+			}
+			layer += layersDelta;	
+			if(layer < layers) 
+			{
+				requestAnimationFrame(draw);
+			}
+		}
+		return draw;	
+	}
+
 	function bindToClick(element, intervals, drawFunction) {
 		element.click(function() {
 			if(intervals.length == 1) {
@@ -72,12 +90,15 @@ require([], function() {
 			intervals.push(drawFunction());
 		});
 	}
+	
 	function stop(intervals) {
 		while(intervals.length > 0) {
 			console.log(intervals);
 			clearInterval(intervals.pop());
 		}
 	}
+
+
 	$(document).ready(function() {
 		var canvas = $("#screen").get(0);
   	var canvas2DContext = canvas.getContext("2d");
@@ -88,22 +109,8 @@ require([], function() {
   	var intervals = [];
 
   	$("#spiral-btn").click(function() {
-			var layers = xLayers;
-			var layer = 0;
-			var last = null;
 			var rate = 0.01;
-			function draw(timestamp) {
-				if(last === null) last = timestamp;
-				var layersDelta = (timestamp - last) * rate;
-				for(l = layer; l < layer + layersDelta; l++) {
-					drawLayer(canvas2DContext, l, layers, randColor());
-				}
-				layer += layersDelta;	
-				if(layer < layers) 
-				{
-					requestAnimationFrame(draw);
-				}
-			}	
+			var draw = spiralDrawing(canvas2DContext, xLayers, rate);
 	 		requestAnimationFrame(draw);
   	});
 
