@@ -1,4 +1,4 @@
-require.config();
+	require.config();
 
 require([], function() {
 	function randColor() {
@@ -8,7 +8,7 @@ require([], function() {
     return 'rgba(' + r + "," + g + "," + b + "," + 255.0 + ")";
   }
 
-	function washUpAndWashDown(drawingContext, cWidth, cHeight, stripeWidth) {
+	function washUpAndWashDown(drawingContext, cWidth, cHeight, stripeWidth, intervalLength) {
 		var color = randColor();
 		var numStripes =  cWidth / stripeWidth;
 		var increment = 60;
@@ -19,13 +19,13 @@ require([], function() {
 			x0 = (x0 + stripeWidth) % cWidth;
 			color = randColor();
 		}
-		
+
 		var intervalId = setInterval(function() {
-			washDown(drawingContext, 
+			washDown(drawingContext,
 								x0,
 								y0,
-								stripeWidth,   
-								increment, 
+								stripeWidth,
+								increment,
 								color);
 			y0 += increment;
 			if(y0 < 0) {
@@ -35,20 +35,20 @@ require([], function() {
 				y0 = cHeight;
 				updateY();
 			}
-		}, 5);
+		}, intervalLength);
 		return intervalId;
 	}
 
 	function washDown(drawingContext, x, y, stripeWidth, increment, color) {
 		drawingContext.fillStyle = color;
 		if(increment < 0) {
-			drawingContext.fillRect(x, y + increment, stripeWidth, Math.abs(increment));			
+			drawingContext.fillRect(x, y + increment, stripeWidth, Math.abs(increment));
 		} else {
 			drawingContext.fillRect(x, y, stripeWidth, increment);
 		}
 	}
 
-	function drawLayer(drawingContext, layer, layers, color) {		
+	function drawLayer(drawingContext, layer, layers, color) {
 			drawingContext.fillStyle = color;
 			var x0 =  layers - layer;
 			var x1 = layers + layer;
@@ -56,31 +56,33 @@ require([], function() {
 			var y1 = layers + layer;
 			var length = layer * 2;
 			drawingContext.fillRect(x0, y0, length, 1);
-			drawingContext.fillRect(x0, y1, length + 1, 1);		
+			drawingContext.fillRect(x0, y1, length + 1, 1);
 			drawingContext.fillRect(x0, y0, 1, length);
 			drawingContext.fillRect(x1, y0, 1, length);
 	}
 
-	function drawSpirals(imageData, canvas2DContext, totalLayers, interval) {
+	function drawSpirals(imageData, canvas2DContext, totalLayers, intervalLength) {
 		var currentLayer = 0;
 		var intervalId = setInterval(function(){
 			drawLayer(imageData, currentLayer, totalLayers, randColor());
 			currentLayer = (currentLayer + 1)	% (totalLayers + 1);
-		}, interval);
+		}, intervalLength);
 		return intervalId;
 	}
-	function bindToClick(element, drawFunction) {
-		var interval = -1;
+	function bindToClick(element, intervals, drawFunction) {
 		element.click(function() {
-			if(interval === -1) {
-				interval = drawFunction();
-			} else {
-				clearInterval(interval);
-				interval = -1;
+			if(intervals.length == 1) {
+				clearInterval(intervals.pop());
 			}
+			intervals.push(drawFunction());
 		});
 	}
-
+	function stop(intervals) {
+		while(intervals.length > 0) {
+			console.log(intervals);
+			clearInterval(intervals.pop());
+		}
+	}
 	$(document).ready(function() {
 		var canvas = $("#screen").get(0);
   	var canvas2DContext = canvas.getContext("2d");
@@ -88,12 +90,16 @@ require([], function() {
   	var xLayers = width / 2;
   	var height = canvas.height;
   	var imageData = canvas2DContext.createImageData(width, height);
-  	
-  	bindToClick($("#spiral-btn"), function(){
-  		return drawSpirals(canvas2DContext, canvas2DContext, xLayers, 5);
+  	var intervals = [];
+
+  	bindToClick($("#spiral-btn"), intervals, function(){
+  		return drawSpirals(canvas2DContext, canvas2DContext, xLayers, 20);
   	});
-  	bindToClick($("#wash-btn"), function(){
-  		return washUpAndWashDown(canvas2DContext, width, height, 11);
+  	bindToClick($("#wash-btn"), intervals, function(){
+  		return washUpAndWashDown(canvas2DContext, width, height, 11, 20);
+  	});
+  	$("#stop-btn").click(function(){
+  		stop(intervals);
   	});
 	});
 });

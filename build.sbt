@@ -6,10 +6,10 @@ libraryDependencies ++= Seq(
   jdbc,
   anorm,
   cache
-)     
+)
 
 play.Project.playScalaSettings
-requireJs += "main.js"
 
+requireJs += "main.js"
 
 requireJsShim += "main.js"
