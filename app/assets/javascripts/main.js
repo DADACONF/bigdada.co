@@ -1,6 +1,9 @@
-	require.config();
+require.config();
 
 require([], function() {
+	window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame ||
+                              window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
+
 	function randColor() {
 		var r = Math.random() * 256 | 0;
     var g = Math.random() * 256 | 0;
@@ -61,14 +64,6 @@ require([], function() {
 			drawingContext.fillRect(x1, y0, 1, length);
 	}
 
-	function drawSpirals(imageData, canvas2DContext, totalLayers, intervalLength) {
-		var currentLayer = 0;
-		var intervalId = setInterval(function(){
-			drawLayer(imageData, currentLayer, totalLayers, randColor());
-			currentLayer = (currentLayer + 1)	% (totalLayers + 1);
-		}, intervalLength);
-		return intervalId;
-	}
 	function bindToClick(element, intervals, drawFunction) {
 		element.click(function() {
 			if(intervals.length == 1) {
@@ -92,12 +87,30 @@ require([], function() {
   	var imageData = canvas2DContext.createImageData(width, height);
   	var intervals = [];
 
-  	bindToClick($("#spiral-btn"), intervals, function(){
-  		return drawSpirals(canvas2DContext, canvas2DContext, xLayers, 20);
+  	$("#spiral-btn").click(function() {
+			var layers = xLayers;
+			var layer = 0;
+			var last = null;
+			var rate = 0.01;
+			function draw(timestamp) {
+				if(last === null) last = timestamp;
+				var layersDelta = (timestamp - last) * rate;
+				for(l = layer; l < layer + layersDelta; l++) {
+					drawLayer(canvas2DContext, l, layers, randColor());
+				}
+				layer += layersDelta;	
+				if(layer < layers) 
+				{
+					requestAnimationFrame(draw);
+				}
+			}	
+	 		requestAnimationFrame(draw);
   	});
+
   	bindToClick($("#wash-btn"), intervals, function(){
   		return washUpAndWashDown(canvas2DContext, width, height, 11, 20);
   	});
+
   	$("#stop-btn").click(function(){
   		stop(intervals);
   	});
