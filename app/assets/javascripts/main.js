@@ -4,26 +4,43 @@ require([], function() {
 	window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame ||
                               window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
 
-	function randColor() {
-		var r = Math.random() * 256 | 0;
-    var g = Math.random() * 256 | 0;
-    var b = Math.random() * 256 | 0;
-    return 'rgba(' + r + "," + g + "," + b + "," + 255.0 + ")";
-  }
+		function randColor() {
+			var r = Math.random() * 256 | 0;
+	    var g = Math.random() * 256 | 0;
+	    var b = Math.random() * 256 | 0;
+	    return 'rgba(' + r + "," + g + "," + b + "," + 255.0 + ")";
+	  }
+
+  	function washRight(drawingContext, rate, height, width, color) {
+		var last = null;
+		var x = 0;
+		function draw(timestamp) {
+			if(last === null) last = timestamp;
+			var xDelta = (timestamp - last) * rate;
+			drawingContext.fillStyle = color;
+			drawingContext.fillRect(x, 0, x + xDelta, height);
+			x+=xDelta;
+			if(x < width){	
+				requestAnimationFrame(draw);
+			}
+		}
+		return draw;
+	}
 
 	function stripes(drawingContext, cWidth, cHeight, stripeWidth, rate) {
-		function updateY() {
-			increment = -increment;
-			x = (x + stripeWidth);
-			color = randColor();
-		}
-		var color = randColor();
+
+		
 		var numStripes =  cWidth / stripeWidth;
-		var increment = 60;
 		var x = 0;
 		var y = 0;
 
 		function draw(timestamp){
+			var increment = 60;
+			function updateY() {
+				increment = -increment;
+				x = (x + stripeWidth);
+			}	
+			var color = randColor();
 			drawStripe(drawingContext,
 								x,
 								y,
@@ -94,13 +111,17 @@ require([], function() {
   	var imageData = canvas2DContext.createImageData(width, height);
 
   	$("#spiral-btn").click(function() {
-			var rate = 0.05;
+			var rate = 0.5;
 			var draw = spiralDrawing(canvas2DContext, xLayers, rate);
 	 		requestAnimationFrame(draw);
   	});
 
   	$("#wash-btn").click(function(){
   		var draw = stripes(canvas2DContext, width, height, 11, 20);
+  		requestAnimationFrame(draw);
+  	});
+  	$("#right-btn").click(function(){
+  		var draw = washRight(canvas2DContext, 0.1, width, height, randColor());
   		requestAnimationFrame(draw);
   	});
   	
