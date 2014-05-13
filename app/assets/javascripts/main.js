@@ -19,7 +19,7 @@ require([], function() {
 			var xDelta = Math.pow(timestamp - last, 2) * rate;
 			last = timestamp;
 			drawingContext.fillStyle = color;
-			drawingContext.fillRect(x, 0, x + xDelta, height);
+			drawingContext.fillRect(x, 0, x + xDelta + 1, height);
 			x+=xDelta;
 			if(x < width){
 				requestAnimationFrame(draw);
@@ -75,7 +75,7 @@ require([], function() {
 	function drawStripe(drawingContext, x, y, stripeWidth, increment, color) {
 		drawingContext.fillStyle = color;
 		if(increment < 0) {
-			drawingContext.fillRect(x, y + increment, stripeWidth, Math.abs(increment));
+			drawingContext.fillRect(x, y + increment, stripeWidth, Math.abs(increment) + 1);
 		} else {
 			drawingContext.fillRect(x, y, stripeWidth, increment);
 		}
@@ -128,7 +128,7 @@ require([], function() {
   	});
 
   	$("#wash-btn").click(function(){
-  		var draw = stripes(canvas2DContext, width, height, 20, .5);
+  		var draw = stripes(canvas2DContext, width, height, 20, 0.5);
   		requestAnimationFrame(draw);
   	});
   	$("#right-btn").click(function(){
