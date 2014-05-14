@@ -124,16 +124,30 @@ require([], function() {
 		this.color = color || randColor();
 	}
 
-	function circleSweep(ctx, angleRate, width, height) {
+	function CircleByBox(x0, y0, x1, y1, color) {
+		this.radius = ((x1 - x0) / 2) - ((x1 - x0) / 16);
+		this.center = {
+			x : (x1 - x0) / 2 + x0,
+		  y : (y1 - y0) / 2 + y0
+		}
+		this.angleFilled = 0;
+		this.color = color || randColor();
+	}
+
+	function circleSweep(ctx, angleRate, width, height, exp) {
 		var last = null;
 		var circles = [];
-		var numCircles = 1;
+		var numCircles = Math.pow(4, exp);
+		var boxWidth = (width / Math.sqrt(numCircles));
+		var boxHeight = (height / Math.sqrt(numCircles));
 		for(i = 0; i < numCircles; i++) {
-			var x = width / Math.pow(2.0, numCircles);
-			var y = height / Math.pow(2.0, numCircles);
-			var r = width / Math.pow(2.0, numCircles);
-			circles.push(new Circle(x, y, r));
+			var x0 = boxWidth * (i % Math.sqrt(numCircles));
+			// var y0 = boxHeight * i;
+			var y0 = boxHeight * (Math.floor(i / Math.sqrt(numCircles)));
+			// i is which box, height
+			circles.push(new CircleByBox(x0, y0, x0 + boxWidth, y0 + boxHeight));
 		}
+
 		function draw(timestamp) {
 			if(last === null) last = timestamp;
 			var angleDelta = (timestamp - last) * angleRate;
@@ -146,7 +160,7 @@ require([], function() {
 				ctx.moveTo(circle.center.x, circle.center.y);
 				var yD0 = (circle.radius * Math.sin(circle.angleFilled)) + circle.center.y;
 				var xD0 = (circle.radius * Math.cos(circle.angleFilled)) + circle.center.x;
-				ctx.lineTo(xD0, yD0);	
+				ctx.lineTo(xD0, yD0);
 				ctx.arc(circle.center.x, circle.center.y, circle.radius, circle.angleFilled, circle.angleFilled + angleDelta, false);
 				ctx.moveTo(circle.center.x, circle.center.y);
 				ctx.fill();
@@ -186,7 +200,7 @@ require([], function() {
   		requestAnimationFrame(draw);
   	});
   	$("#circles-btn").click(function(){
-  		var draw = circleSweep(canvas2DContext, 0.07, width, height);
+  		var draw = circleSweep(canvas2DContext, 0.03, width, height, 5);
   		requestAnimationFrame(draw);
   	});
 	});
