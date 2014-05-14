@@ -114,22 +114,34 @@ require([], function() {
 		return draw;
 	}
 
-	function circleSweep(ctx, rate) {
-		var last = null;
-		var circles = [
-			{
-				radius: 50,
-				center: { x: 250, y : 250},
-				angleFilled: 0
-			}
-		];
+	function Circle(x, y, radius, color) {
+		this.radius = radius;
+		this.center = {
+			"x" : x,
+			"y" : y
+		};
+		this.angleFilled = 0;
+		this.color = color || randColor();
+	}
 
+	function circleSweep(ctx, angleRate, width, height) {
+		var last = null;
+		var circles = [];
+		var numCircles = 1;
+		for(i = 0; i < numCircles; i++) {
+			var x = width / Math.pow(2.0, numCircles);
+			var y = height / Math.pow(2.0, numCircles);
+			var r = width / Math.pow(2.0, numCircles);
+			circles.push(new Circle(x, y, r));
+		}
 		function draw(timestamp) {
 			if(last === null) last = timestamp;
-			var angleDelta = (timestamp - last) * rate;
-			for(var i = 0; i < circles.length; i++) {
-				ctx.fillStyle = randColor();
-				var circle = circles[i];
+			var angleDelta = (timestamp - last) * angleRate;
+			var circlesRemaining = circles.length;
+			while(circlesRemaining > 0) {
+				var circle =  circles.shift();
+				circlesRemaining--;
+				ctx.fillStyle = circle.color;
 				ctx.beginPath();
 				ctx.moveTo(circle.center.x, circle.center.y);
 				var yD0 = (circle.radius * Math.sin(circle.angleFilled)) + circle.center.y;
@@ -138,13 +150,17 @@ require([], function() {
 				ctx.arc(circle.center.x, circle.center.y, circle.radius, circle.angleFilled, circle.angleFilled + angleDelta, false);
 				ctx.moveTo(circle.center.x, circle.center.y);
 				ctx.fill();
-				circle.angleFilled += angleDelta;
-				circle.radius += 15;
+				ctx.closePath();
+				circle.angleFilled += (angleDelta * 0.2);
+				if(circle.angleFilled < Math.PI * 2) {
+					circles.push(circle);
+				}
 			}
 			last = timestamp;
-			requestAnimationFrame(draw);
+			if(circles.length > 0) {
+				requestAnimationFrame(draw);
+			}
 		}
-
 		return draw;
 	}
 
@@ -161,16 +177,17 @@ require([], function() {
 			var draw = spiralDrawing(canvas2DContext, xLayers, rate);
 	 		requestAnimationFrame(draw);
   	});
-
   	$("#wash-btn").click(function(){
-  		var draw = circleSweep(canvas2DContext, 0.01);
-  		// var draw = stripes(canvas2DContext, width, height, 20, 0.5);
+  		var draw = stripes(canvas2DContext, width, height, 20, 0.5);
   		requestAnimationFrame(draw);
   	});
   	$("#right-btn").click(function(){
   		var draw = washRight(canvas2DContext, width, height, randColor(), 0.05);
   		requestAnimationFrame(draw);
   	});
-
+  	$("#circles-btn").click(function(){
+  		var draw = circleSweep(canvas2DContext, 0.07, width, height);
+  		requestAnimationFrame(draw);
+  	});
 	});
 });
