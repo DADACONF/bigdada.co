@@ -173,6 +173,10 @@ require([], function() {
 			last = timestamp;
 			if(circles.length > 0) {
 				requestAnimationFrame(draw);
+			} else {
+				if(exp < 5) {
+					requestAnimationFrame(circleSweep(ctx, angleRate, width, height, exp + 1));
+				}
 			}
 		}
 		return draw;
@@ -200,7 +204,7 @@ require([], function() {
   		requestAnimationFrame(draw);
   	});
   	$("#circles-btn").click(function(){
-  		var draw = circleSweep(canvas2DContext, 0.03, width, height, 5);
+  		var draw = circleSweep(canvas2DContext, 0.03, width, height, 0);
   		requestAnimationFrame(draw);
   	});
 	});
