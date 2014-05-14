@@ -42,6 +42,7 @@ require([], function() {
 		}
 
 		function draw(timestamp){
+			var updated = null;
 			if(last === null) last = timestamp;
 			var increment = (timestamp - last) * 1.5;
 			last = timestamp;
@@ -54,13 +55,13 @@ require([], function() {
 			y = Math.floor(y + increment * yDirection);
 			if(y < 0) {
 				y = 0;
-				var updated = updateY(yDirection, x);
+				updated = updateY(yDirection, x);
 				yDirection = updated[0];
 				x = updated[1];
 				color = updated[2];
 			} else if(y > cHeight) {
 				y = cHeight;
-				var updated = updateY(yDirection, x);
+				updated = updateY(yDirection, x);
 				yDirection = updated[0];
 				x = updated[1];
 				color = updated[2];
@@ -113,6 +114,40 @@ require([], function() {
 		return draw;
 	}
 
+	function circleSweep(ctx, rate) {
+		var last = null;
+		var circles = [
+			{
+				radius: 50,
+				center: { x: 250, y : 250},
+				angleFilled: 0
+			}
+		];
+
+		function draw(timestamp) {
+			if(last === null) last = timestamp;
+			var angleDelta = (timestamp - last) * rate;
+			for(var i = 0; i < circles.length; i++) {
+				ctx.fillStyle = randColor();
+				var circle = circles[i];
+				ctx.beginPath();
+				ctx.moveTo(circle.center.x, circle.center.y);
+				var yD0 = (circle.radius * Math.sin(circle.angleFilled)) + circle.center.y;
+				var xD0 = (circle.radius * Math.cos(circle.angleFilled)) + circle.center.x;
+				ctx.lineTo(xD0, yD0);	
+				ctx.arc(circle.center.x, circle.center.y, circle.radius, circle.angleFilled, circle.angleFilled + angleDelta, false);
+				ctx.moveTo(circle.center.x, circle.center.y);
+				ctx.fill();
+				circle.angleFilled += angleDelta;
+				circle.radius += 15;
+			}
+			last = timestamp;
+			requestAnimationFrame(draw);
+		}
+
+		return draw;
+	}
+
 	$(document).ready(function() {
 		var canvas = $("#screen").get(0);
   	var canvas2DContext = canvas.getContext("2d");
@@ -128,7 +163,8 @@ require([], function() {
   	});
 
   	$("#wash-btn").click(function(){
-  		var draw = stripes(canvas2DContext, width, height, 20, 0.5);
+  		var draw = circleSweep(canvas2DContext, 0.01);
+  		// var draw = stripes(canvas2DContext, width, height, 20, 0.5);
   		requestAnimationFrame(draw);
   	});
   	$("#right-btn").click(function(){
