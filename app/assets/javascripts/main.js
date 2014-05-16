@@ -11,6 +11,16 @@ require([], function() {
         return 'rgba(' + r + "," + g + "," + b + "," + 255.0 + ")";
     }
 
+    function coolColor(idx) {
+        var palette = ["#4878A8", "#A8D8F0", "#F07830", "#833D2B"];
+        return palette[idx % palette.length];
+    }
+
+    function greyColor(idx) {
+        var palette = ["FFFFFF"];
+        return palette[idx % palette.length];
+    }
+
     function washRight(drawingContext, height, width, color, rate) {
         var last = null;
         var x = 0;
@@ -129,7 +139,7 @@ require([], function() {
         return drawFunc;
     }
 
-    function Circle(x, y, radius, color) {
+    function Circle(x, y, radius, color, text) {
         this.radius = radius;
         this.center = {
             "x": x,
@@ -137,13 +147,14 @@ require([], function() {
         };
         this.angleFilled = 0;
         this.color = color || randColor();
+        this.text = text || "";
     }
 
-    function CircleByBox(x0, y0, x1, y1, color) {
+    function CircleByBox(x0, y0, x1, y1, color, text) {
         var radius = ((x1 - x0) / 2) - ((x1 - x0) / 16);
         var x = (x1 - x0) / 2 + x0;
         var y = (y1 - y0) / 2 + y0;
-        return new Circle(x, y, radius);
+        return new Circle(x, y, radius, color, text);
     }
 
     function circleSweep(ctx, angleRate, width, height, exp) {
@@ -152,13 +163,15 @@ require([], function() {
         var numCircles = Math.pow(4, exp);
         var boxWidth = (width / Math.sqrt(numCircles));
         var boxHeight = (height / Math.sqrt(numCircles));
+        var text = "BIG?DADA";
         for (i = 0; i < numCircles; i++) {
             var x0 = boxWidth * (i % Math.sqrt(numCircles));
             // var y0 = boxHeight * i;
             var y0 = boxHeight * (Math.floor(i / Math.sqrt(numCircles)));
             // i is which box, height
-            circles.push(new CircleByBox(x0, y0, x0 + boxWidth, y0 + boxHeight));
+            circles.push(new CircleByBox(x0, y0, x0 + boxWidth, y0 + boxHeight, coolColor(i), text[i % text.length]));
         }
+
 
         function drawFunc(resolve) {
             function draw(timestamp) {
@@ -181,13 +194,21 @@ require([], function() {
                     circle.angleFilled += (angleDelta * 0.2);
                     if (circle.angleFilled < Math.PI * 2) {
                         circles.push(circle);
+                    } else {
+                        ctx.fillStyle = "#222222";
+                        ctx.font = Math.ceil(circle.radius * 1.75) + "px Courier";
+                        var text = circle.text;
+                        var textSize = ctx.measureText(text);
+                        ctx.fillText(text, circle.center.x - (textSize.width / 2), circle.center.y + (textSize.width / 2));
                     }
                 }
                 last = timestamp;
                 if (circles.length > 0) {
                     requestAnimationFrame(drawFunc(resolve));
                 } else {
-                    resolve(5);
+                    setTimeout(function() {
+                        resolve(5);
+                    }, 1000);
                 }
             }
             return draw;
@@ -226,14 +247,14 @@ require([], function() {
             queueAnimation(washRight(canvas2DContext, width, height, randColor(), 0.05));
         });
         $("#circles-btn").click(function() {
-            drawingQueue.push(washRight(canvas2DContext, width, height, randColor(), 0.06));
+            drawingQueue.push(washRight(canvas2DContext, width, height, greyColor(0), 0.06));
             drawingQueue.push(circleSweep(canvas2DContext, 0.03, width, height, 1));
-            drawingQueue.push(washRight(canvas2DContext, width, height, randColor(), 0.07));
+            drawingQueue.push(washRight(canvas2DContext, width, height, greyColor(1), 0.07));
             drawingQueue.push(circleSweep(canvas2DContext, 0.03, width, height, 2));
-            drawingQueue.push(washRight(canvas2DContext, width, height, randColor(), 0.08));
+            drawingQueue.push(washRight(canvas2DContext, width, height, greyColor(2), 0.08));
             drawingQueue.push(circleSweep(canvas2DContext, 0.03, width, height, 3));
-            drawingQueue.push(washRight(canvas2DContext, width, height, randColor(), 0.09));
-            drawingQueue.push(circleSweep(canvas2DContext, 0.03, width, height, 4));
+            // drawingQueue.push(washRight(canvas2DContext, width, height, greyColor(3), 0.09));
+            // drawingQueue.push(circleSweep(canvas2DContext, 0.03, width, height, 4));
             queueAnimation(circleSweep(canvas2DContext, 0.03, width, height, 0));
         });
     });
