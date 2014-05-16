@@ -253,6 +253,7 @@ require([], function() {
             drawingQueue.push(circleSweep(canvas2DContext, 0.03, width, height, 2));
             drawingQueue.push(washRight(canvas2DContext, width, height, greyColor(2), 0.08));
             drawingQueue.push(circleSweep(canvas2DContext, 0.03, width, height, 3));
+            drawingQueue.push(rotate(canvas2DContext, width, height));
             // drawingQueue.push(washRight(canvas2DContext, width, height, greyColor(3), 0.09));
             // drawingQueue.push(circleSweep(canvas2DContext, 0.03, width, height, 4));
             queueAnimation(circleSweep(canvas2DContext, 0.03, width, height, 0));
