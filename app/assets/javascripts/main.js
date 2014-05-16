@@ -134,7 +134,7 @@ require([], function() {
 		this.color = color || randColor();
 	}
 
-	function circleSweep(ctx, angleRate, width, height, exp) {
+	function circleSweep(ctx, angleRate, width, height, exp, resolve) {
 		var last = null;
 		var circles = [];
 		var numCircles = Math.pow(4, exp);
@@ -173,10 +173,10 @@ require([], function() {
 			last = timestamp;
 			if(circles.length > 0) {
 				requestAnimationFrame(draw);
+			} else if(exp > 0) {
+					requestAnimationFrame(circleSweep(ctx, angleRate, width, height, exp - 1, resolve));
 			} else {
-				if(exp > 0) {
-					requestAnimationFrame(circleSweep(ctx, angleRate, width, height, exp - 1));
-				}
+				resolve(5);
 			}
 		}
 		return draw;
@@ -189,6 +189,7 @@ require([], function() {
   	var xLayers = width / 2;
   	var height = canvas.height;
   	var imageData = canvas2DContext.createImageData(width, height);
+
 
   	$("#spiral-btn").click(function() {
 			var rate = 0.5;
@@ -204,8 +205,13 @@ require([], function() {
   		requestAnimationFrame(draw);
   	});
   	$("#circles-btn").click(function(){
-  		var draw = circleSweep(canvas2DContext, 0.03, width, height, 6);
-  		requestAnimationFrame(draw);
+  		var p = new Promise(function(resolve, reject) {
+  			//do stuff
+  			// either resolve or reject
+				var draw = circleSweep(canvas2DContext, 0.03, width, height, 6, resolve);
+				requestAnimationFrame(draw);
+  		});
+  		p.then(function(){console.log("promise resolved")});
   	});
 	});
 });
