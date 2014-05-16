@@ -14,25 +14,29 @@ require([], function() {
   	function washRight(drawingContext, height, width, color, rate) {
 		var last = null;
 		var x = 0;
-		function draw(timestamp) {
-			if(last === null) last = timestamp;
-			var xDelta = Math.pow(timestamp - last, 2) * rate;
-			last = timestamp;
-			drawingContext.fillStyle = color;
-			drawingContext.fillRect(x, 0, x + xDelta + 1, height);
-			x+=xDelta;
-			if(x < width){
-				requestAnimationFrame(draw);
+		function drawFunc(resolve) {
+			function draw(timestamp) {
+				if(last === null) last = timestamp;
+				var xDelta = Math.pow(timestamp - last, 2) * rate;
+				last = timestamp;
+				drawingContext.fillStyle = color;
+				drawingContext.fillRect(x, 0, x + xDelta + 1, height);
+				x+=xDelta;
+				if(x < width){
+					requestAnimationFrame(draw);
+				} else {
+					resolve(5);
+				}
 			}
+			return draw;
 		}
-		return draw;
+		return drawFunc;
 	}
 
 	function stripes(drawingContext, cWidth, cHeight, stripeWidth, rate) {
 		var numStripes =  cWidth / stripeWidth;
 		var x = 0;
 		var y = 0;
-		// var increment = 60;
 		var yDirection = 1;
 		var last = null;
 		var color = randColor();
@@ -98,20 +102,25 @@ require([], function() {
 	function spiralDrawing(canvas2DContext, layers, rate) {
 		var last = null;
 		var layer = 0;
-		function draw(timestamp) {
-			if(last === null) last = timestamp;
-			var layersDelta = (timestamp - last) * rate;
-			last = timestamp;
-			for(l = layer; l < layer + layersDelta; l++) {
-				drawLayer(canvas2DContext, l, layers, randColor());
+		function drawFunc(resolve){
+			function draw(timestamp) {
+				if(last === null) last = timestamp;
+				var layersDelta = (timestamp - last) * rate;
+				last = timestamp;
+				for(l = layer; l < layer + layersDelta; l++) {
+					drawLayer(canvas2DContext, l, layers, randColor());
+				}
+				layer += layersDelta;
+				if(layer < layers)
+				{
+					requestAnimationFrame(draw);
+				} else {
+					resolve(5);
+				}
 			}
-			layer += layersDelta;
-			if(layer < layers)
-			{
-				requestAnimationFrame(draw);
-			}
+			return draw;
 		}
-		return draw;
+		return drawFunc;
 	}
 
 	function Circle(x, y, radius, color) {
@@ -125,13 +134,10 @@ require([], function() {
 	}
 
 	function CircleByBox(x0, y0, x1, y1, color) {
-		this.radius = ((x1 - x0) / 2) - ((x1 - x0) / 16);
-		this.center = {
-			x : (x1 - x0) / 2 + x0,
-		  y : (y1 - y0) / 2 + y0
-		}
-		this.angleFilled = 0;
-		this.color = color || randColor();
+		var radius = ((x1 - x0) / 2) - ((x1 - x0) / 16);
+		var x = (x1 - x0) / 2 + x0;
+		var y = (y1 - y0) / 2 + y0;
+		return new Circle(x, y, radius);
 	}
 
 	function circleSweep(ctx, angleRate, width, height, exp) {
@@ -173,8 +179,6 @@ require([], function() {
 				last = timestamp;
 				if(circles.length > 0) {
 					requestAnimationFrame(drawFunc(resolve));
-				} else if(exp > 0) {
-					requestAnimationFrame(circleSweep(ctx, angleRate, width, height, exp - 1)(resolve));
 				} else {
 					resolve(5);
 				}
@@ -200,15 +204,13 @@ require([], function() {
   		p.then(function(){
   			if(drawingQueue.length > 0) {
 	  			var next = drawingQueue.shift();
-					console.log("queueing Next...");
   				queueAnimation(next);
   			}
   		});
 		}
 
   	$("#spiral-btn").click(function() {
-			var rate = 0.5;
-			var draw = spiralDrawing(canvas2DContext, xLayers, rate);
+			var draw = spiralDrawing(canvas2DContext, xLayers, 0.05);
 	 		requestAnimationFrame(draw);
   	});
   	$("#wash-btn").click(function(){
@@ -220,8 +222,17 @@ require([], function() {
   		requestAnimationFrame(draw);
   	});
   	$("#circles-btn").click(function(){
+	  	drawingQueue.push(washRight(canvas2DContext, width, height, randColor(), 0.06));
   		drawingQueue.push(circleSweep(canvas2DContext, 0.03, width, height, 1));
-			queueAnimation(circleSweep(canvas2DContext, 0.03, width, height, 1));
+	  	drawingQueue.push(washRight(canvas2DContext, width, height, randColor(), 0.07));
+	  	drawingQueue.push(circleSweep(canvas2DContext, 0.03, width, height, 2));
+	  	drawingQueue.push(washRight(canvas2DContext, width, height, randColor(), 0.08));
+	  	drawingQueue.push(circleSweep(canvas2DContext, 0.03, width, height, 3));
+	  	drawingQueue.push(washRight(canvas2DContext, width, height, randColor(), 0.09));
+	  	drawingQueue.push(circleSweep(canvas2DContext, 0.03, width, height, 4));
+			drawingQueue.push(spiralDrawing(canvas2DContext, xLayers, 0.05));
+
+			queueAnimation(circleSweep(canvas2DContext, 0.03, width, height, 0));
   	});
 	});
 });
