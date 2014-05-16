@@ -44,37 +44,41 @@ require([], function() {
 		function updateY(yDirection, xPos) {
 			return [-yDirection, xPos + stripeWidth, randColor()];
 		}
-
-		function draw(timestamp){
-			var updated = null;
-			if(last === null) last = timestamp;
-			var increment = (timestamp - last) * 1.5;
-			last = timestamp;
-			drawStripe(drawingContext,
-								x,
-								y,
-								stripeWidth,
-								increment * yDirection,
-								color);
-			y = Math.floor(y + increment * yDirection);
-			if(y < 0) {
-				y = 0;
-				updated = updateY(yDirection, x);
-				yDirection = updated[0];
-				x = updated[1];
-				color = updated[2];
-			} else if(y > cHeight) {
-				y = cHeight;
-				updated = updateY(yDirection, x);
-				yDirection = updated[0];
-				x = updated[1];
-				color = updated[2];
+		function drawFunc(resolve) {
+			function draw(timestamp){
+				var updated = null;
+				if(last === null) last = timestamp;
+				var increment = (timestamp - last) * 1.5;
+				last = timestamp;
+				drawStripe(drawingContext,
+									x,
+									y,
+									stripeWidth,
+									increment * yDirection,
+									color);
+				y = Math.floor(y + increment * yDirection);
+				if(y < 0) {
+					y = 0;
+					updated = updateY(yDirection, x);
+					yDirection = updated[0];
+					x = updated[1];
+					color = updated[2];
+				} else if(y > cHeight) {
+					y = cHeight;
+					updated = updateY(yDirection, x);
+					yDirection = updated[0];
+					x = updated[1];
+					color = updated[2];
+				}
+				if(x <= cWidth) {
+					requestAnimationFrame(draw);
+				} else {
+					resolve(5);
+				}
 			}
-			if(x <= cWidth) {
-				requestAnimationFrame(draw);
-			}
+			return draw;
 		}
-		return draw;
+		return drawFunc;
 	}
 
 	function drawStripe(drawingContext, x, y, stripeWidth, increment, color) {
@@ -105,7 +109,7 @@ require([], function() {
 		function drawFunc(resolve){
 			function draw(timestamp) {
 				if(last === null) last = timestamp;
-				var layersDelta = (timestamp - last) * rate;
+				var layersDelta = Math.ceil((timestamp - last) * rate);
 				last = timestamp;
 				for(l = layer; l < layer + layersDelta; l++) {
 					drawLayer(canvas2DContext, l, layers, randColor());
@@ -210,16 +214,13 @@ require([], function() {
 		}
 
   	$("#spiral-btn").click(function() {
-			var draw = spiralDrawing(canvas2DContext, xLayers, 0.05);
-	 		requestAnimationFrame(draw);
+			queueAnimation(spiralDrawing(canvas2DContext, xLayers, 0.05));
   	});
   	$("#wash-btn").click(function(){
-  		var draw = stripes(canvas2DContext, width, height, 20, 0.5);
-  		requestAnimationFrame(draw);
+  		queueAnimation(stripes(canvas2DContext, width, height, 20, 0.5));
   	});
   	$("#right-btn").click(function(){
-  		var draw = washRight(canvas2DContext, width, height, randColor(), 0.05);
-  		requestAnimationFrame(draw);
+  		queueAnimation(washRight(canvas2DContext, width, height, randColor(), 0.05));
   	});
   	$("#circles-btn").click(function(){
 	  	drawingQueue.push(washRight(canvas2DContext, width, height, randColor(), 0.06));
@@ -231,7 +232,6 @@ require([], function() {
 	  	drawingQueue.push(washRight(canvas2DContext, width, height, randColor(), 0.09));
 	  	drawingQueue.push(circleSweep(canvas2DContext, 0.03, width, height, 4));
 			drawingQueue.push(spiralDrawing(canvas2DContext, xLayers, 0.05));
-
 			queueAnimation(circleSweep(canvas2DContext, 0.03, width, height, 0));
   	});
 	});
