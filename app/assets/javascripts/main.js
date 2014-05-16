@@ -134,7 +134,7 @@ require([], function() {
 		this.color = color || randColor();
 	}
 
-	function circleSweep(ctx, angleRate, width, height, exp, resolve) {
+	function circleSweep(ctx, angleRate, width, height, exp) {
 		var last = null;
 		var circles = [];
 		var numCircles = Math.pow(4, exp);
@@ -147,39 +147,41 @@ require([], function() {
 			// i is which box, height
 			circles.push(new CircleByBox(x0, y0, x0 + boxWidth, y0 + boxHeight));
 		}
-
-		function draw(timestamp) {
-			if(last === null) last = timestamp;
-			var angleDelta = (timestamp - last) * angleRate;
-			var circlesRemaining = circles.length;
-			while(circlesRemaining > 0) {
-				var circle =  circles.shift();
-				circlesRemaining--;
-				ctx.fillStyle = circle.color;
-				ctx.beginPath();
-				ctx.moveTo(circle.center.x, circle.center.y);
-				var yD0 = (circle.radius * Math.sin(circle.angleFilled)) + circle.center.y;
-				var xD0 = (circle.radius * Math.cos(circle.angleFilled)) + circle.center.x;
-				ctx.lineTo(xD0, yD0);
-				ctx.arc(circle.center.x, circle.center.y, circle.radius, circle.angleFilled, circle.angleFilled + angleDelta, false);
-				ctx.moveTo(circle.center.x, circle.center.y);
-				ctx.fill();
-				ctx.closePath();
-				circle.angleFilled += (angleDelta * 0.2);
-				if(circle.angleFilled < Math.PI * 2) {
-					circles.push(circle);
+		function drawFunc(resolve) {
+			function draw(timestamp) {
+				if(last === null) last = timestamp;
+				var angleDelta = (timestamp - last) * angleRate;
+				var circlesRemaining = circles.length;
+				while(circlesRemaining > 0) {
+					var circle =  circles.shift();
+					circlesRemaining--;
+					ctx.fillStyle = circle.color;
+					ctx.beginPath();
+					ctx.moveTo(circle.center.x, circle.center.y);
+					var yD0 = (circle.radius * Math.sin(circle.angleFilled)) + circle.center.y;
+					var xD0 = (circle.radius * Math.cos(circle.angleFilled)) + circle.center.x;
+					ctx.lineTo(xD0, yD0);
+					ctx.arc(circle.center.x, circle.center.y, circle.radius, circle.angleFilled, circle.angleFilled + angleDelta, false);
+					ctx.moveTo(circle.center.x, circle.center.y);
+					ctx.fill();
+					ctx.closePath();
+					circle.angleFilled += (angleDelta * 0.2);
+					if(circle.angleFilled < Math.PI * 2) {
+						circles.push(circle);
+					}
+				}
+				last = timestamp;
+				if(circles.length > 0) {
+					requestAnimationFrame(drawFunc(resolve));
+				} else if(exp > 0) {
+					requestAnimationFrame(circleSweep(ctx, angleRate, width, height, exp - 1)(resolve));
+				} else {
+					resolve(5);
 				}
 			}
-			last = timestamp;
-			if(circles.length > 0) {
-				requestAnimationFrame(draw);
-			} else if(exp > 0) {
-					requestAnimationFrame(circleSweep(ctx, angleRate, width, height, exp - 1, resolve));
-			} else {
-				resolve(5);
-			}
+			return draw;
 		}
-		return draw;
+		return drawFunc;
 	}
 
 	$(document).ready(function() {
@@ -189,7 +191,20 @@ require([], function() {
   	var xLayers = width / 2;
   	var height = canvas.height;
   	var imageData = canvas2DContext.createImageData(width, height);
+  	var drawingQueue = [];
 
+  	function queueAnimation(drawFunc) {
+			var p = new Promise(function(resolve, reject) {
+				requestAnimationFrame(drawFunc(resolve));
+			});
+  		p.then(function(){
+  			if(drawingQueue.length > 0) {
+	  			var next = drawingQueue.shift();
+					console.log("queueing Next...");
+  				queueAnimation(next);
+  			}
+  		});
+		}
 
   	$("#spiral-btn").click(function() {
 			var rate = 0.5;
@@ -205,13 +220,8 @@ require([], function() {
   		requestAnimationFrame(draw);
   	});
   	$("#circles-btn").click(function(){
-  		var p = new Promise(function(resolve, reject) {
-  			//do stuff
-  			// either resolve or reject
-				var draw = circleSweep(canvas2DContext, 0.03, width, height, 6, resolve);
-				requestAnimationFrame(draw);
-  		});
-  		p.then(function(){console.log("promise resolved")});
+  		drawingQueue.push(circleSweep(canvas2DContext, 0.03, width, height, 1));
+			queueAnimation(circleSweep(canvas2DContext, 0.03, width, height, 1));
   	});
 	});
 });
