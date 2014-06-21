@@ -1,6 +1,4 @@
-require.config();
-
-require([], function() {
+(function() {
     window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame ||
         window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
 
@@ -163,7 +161,7 @@ require([], function() {
         var numCircles = Math.pow(4, exp);
         var boxWidth = (width / Math.sqrt(numCircles));
         var boxHeight = (height / Math.sqrt(numCircles));
-        var text = "BIG?DADA";
+        var text = "BIG*DADA";
         for (i = 0; i < numCircles; i++) {
             var x0 = boxWidth * (i % Math.sqrt(numCircles));
             // var y0 = boxHeight * i;
@@ -191,6 +189,15 @@ require([], function() {
                     ctx.moveTo(circle.center.x, circle.center.y);
                     ctx.fill();
                     ctx.closePath();
+                    if(circle.angleFilled === 0) {
+                    		ctx.beginPath();
+                    		ctx.strokeStyle = "#222222";
+                    		ctx.lineWidth = 3;
+                    		ctx.arc(circle.center.x, circle.center.y, circle.radius + 2, 0, 2 * Math.PI, false);
+                    		ctx.stroke();
+		                    ctx.closePath();
+                    }
+
                     circle.angleFilled += (angleDelta * 0.2);
                     if (circle.angleFilled < Math.PI * 2) {
                         circles.push(circle);
@@ -200,6 +207,7 @@ require([], function() {
                         var text = circle.text;
                         var textSize = ctx.measureText(text);
                         ctx.fillText(text, circle.center.x - (textSize.width / 2), circle.center.y + (textSize.width / 2));
+                    		
                     }
                 }
                 last = timestamp;
@@ -253,10 +261,9 @@ require([], function() {
             drawingQueue.push(circleSweep(canvas2DContext, 0.03, width, height, 2));
             drawingQueue.push(washRight(canvas2DContext, width, height, greyColor(2), 0.08));
             drawingQueue.push(circleSweep(canvas2DContext, 0.03, width, height, 3));
-            drawingQueue.push(rotate(canvas2DContext, width, height));
             // drawingQueue.push(washRight(canvas2DContext, width, height, greyColor(3), 0.09));
             // drawingQueue.push(circleSweep(canvas2DContext, 0.03, width, height, 4));
             queueAnimation(circleSweep(canvas2DContext, 0.03, width, height, 0));
         });
     });
-});
+}());
