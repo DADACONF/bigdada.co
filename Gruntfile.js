@@ -9,11 +9,12 @@ module.exports = function(grunt) {
       },
       prod: {
         src: 'app/assets/javascripts/main.js',
-        dest: 'build/js/main.min.js'
+        dest: 'build/js/main.min.js',
+        compress: true
       },
       dev: {
         src: 'app/assets/javascripts/main.js',
-        dest: 'build/js/main.min.js',
+        dest: 'build/js/main.js',
         beautify: true
       }
     },
@@ -31,7 +32,7 @@ module.exports = function(grunt) {
           paths: ["app/assets/stylesheets"]
         },
         files: {
-          "build/stylesheets/main.css" : "app/assets/stylesheets/main.less"
+          "build/stylesheets/main.min.css" : "app/assets/stylesheets/main.less"
         },
         compress: true, 
         cleancss: true,
@@ -44,11 +45,29 @@ module.exports = function(grunt) {
           {expand: true, src: "app/views/**", dest: "build/", flatten: true, filter: "isFile"},
           {expand: true, src: "bower_components/bootstrap/dist/css/bootstrap.min.css", dest: "build/stylesheets/", flatten: true},
           {expand: true, src: "bower_components/bootstrap/dist/js/bootstrap.min.js", dest: "build/js/", flatten: true},
-          {expand: true, src: "bower_components/jquery/dist/jquery.min.js", dest: "build/js/", flatten: true},
+          {expand: true, src: "bower_components/jquery/dist/jquery.min.js", dest: "build/js/", flatten: true}
         ]
       },
       prod: {
-        files: [{expand: true, src: "app/views/**", dest: "build/", flatten: true, filter: "isFile"}]
+        files: [
+        {exxpand: true, src: "bower_components/bootstrap/dist/css/bootstrap.min.css", dest: "build/stylesheets/", flatten: true},
+        {expand: true, src: "bower_components/bootstrap/dist/js/bootstrap.min.js", dest: "build/js/", flatten: true},
+        {expand: true, src: "bower_components/jquery/dist/jquery.min.js", dest: "build/js/", flatten: true}]
+        // files: [{expand: true, src: "app/views/**", dest: "build/", flatten: true, filter: "isFile"}]
+      }
+    }, 
+    replace: {
+      dev: {},
+      prod: {
+        src: ["apps/views/index.html"],
+        dest:["build/"],
+        replacements: [
+          { from: "main.js",
+            to: "main.min.js"},
+          { from: "main.css",
+            to: "main.min.css"
+          }
+        ]
       }
     }
   });
@@ -58,6 +77,8 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-requirejs');
   grunt.loadNpmTasks('grunt-contrib-less');
   grunt.loadNpmTasks('grunt-contrib-copy');
+  grunt.loadNpmTasks('grunt-text-replace');
+  grunt.loadNpmTasks('grunt-s3');
 
   // Default task(s).
   grunt.registerTask('default', 'Building a production build', 
