@@ -50,22 +50,47 @@ module.exports = function(grunt) {
       },
       prod: {
         files: [
-        {exxpand: true, src: "bower_components/bootstrap/dist/css/bootstrap.min.css", dest: "build/stylesheets/", flatten: true},
+        {expand: true, src: "bower_components/bootstrap/dist/css/bootstrap.min.css", dest: "build/stylesheets/", flatten: true},
         {expand: true, src: "bower_components/bootstrap/dist/js/bootstrap.min.js", dest: "build/js/", flatten: true},
-        {expand: true, src: "bower_components/jquery/dist/jquery.min.js", dest: "build/js/", flatten: true}]
-        // files: [{expand: true, src: "app/views/**", dest: "build/", flatten: true, filter: "isFile"}]
+        {expand: true, src: "bower_components/jquery/dist/jquery.min.js", dest: "build/js/", flatten: true},
+        {expand: true, src: "app/views/**", dest: "build/", flatten: true, filter: "isFile"}]
       }
     }, 
     replace: {
-      dev: {},
       prod: {
-        src: ["apps/views/index.html"],
-        dest:["build/"],
+        src: ["build/index.html"],
+        overwrite: true,
         replacements: [
-          { from: "main.js",
-            to: "main.min.js"},
-          { from: "main.css",
-            to: "main.min.css"
+          { from: "js/main.js",
+            to: "js/main.min.js"},
+          { from: "stylesheets/main.css",
+            to: "stylesheets/main.min.css"
+          }
+        ]
+      }
+    },
+    clean: ["build/"],
+    aws: grunt.file.readJSON('grunt-aws.json'),
+    s3: {
+      options: {
+        key: '<%= aws.key %>',
+        secret: '<%= aws.secret %>',
+        bucket: '<%= aws.bucket %>',
+        access: 'private'
+      },
+      prod: {
+        upload: [
+          {
+            src: 'build/*',
+            dest: ''
+          },
+          {
+            src: 'build/js/*',
+            dest: 'js/'
+          },
+          {
+            src: 'build/stylesheets/*',
+            dest: 'stylesheets/'
           }
         ]
       }
@@ -79,15 +104,22 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-text-replace');
   grunt.loadNpmTasks('grunt-s3');
-
+  grunt.loadNpmTasks('grunt-contrib-clean');
   // Default task(s).
   grunt.registerTask('default', 'Building a production build', 
-    ['uglify:prod', 
+    ['clean',
+     'uglify:prod', 
      'less:prod', 
-     'copy:prod']);
+     'copy:prod', 
+     'replace:prod']);
+
   grunt.registerTask('dev', 'Generating a development build', 
-    ['uglify:dev', 
+    ['clean',
+     'uglify:dev', 
      'less:dev',
      'copy:dev']);
 
+  grunt.registerTask('deploy', 'Uploading to S3',
+    ['default',
+     's3:prod']);
 };
