@@ -52,24 +52,14 @@ module.exports = function(grunt) {
       }
     },
     copy: {
-      dev: {
-        files: [
+      build: {
+        files: [  
           {expand: true, src: "app/views/**", dest: "build/", flatten: true, filter: "isFile"},
           {expand: true, src: "bower_components/bootstrap/dist/css/bootstrap.min.css", dest: "build/stylesheets/", flatten: true},
           {expand: true, src: "bower_components/bootstrap/dist/js/bootstrap.js", dest: "build/js/", flatten: true},
           {expand: true, src: "bower_components/jquery/dist/jquery.js", dest: "build/js/", flatten: true},
           {expand: true, src: "bower_components/angular/angular.js", dest: "build/js/", flatten: true},
           {expand: true, src: "bower_components/processing/processing.js", dest: "build/js/", flatten: true}
-
-        ]
-      },
-      prod: {
-        files: [
-          {expand: true, src: "bower_components/bootstrap/dist/css/bootstrap.min.css", dest: "build/stylesheets/", flatten: true},
-          {expand: true, src: "bower_components/bootstrap/dist/js/bootstrap.min.js", dest: "build/js/", flatten: true},
-          {expand: true, src: "bower_components/jquery/dist/jquery.min.js", dest: "build/js/", flatten: true},
-          {expand: true, src: "bower_components/angular/angular.min.js", dest: "build/js/", flatten: true},
-          {expand: true, src: "app/views/**", dest: "build/", flatten: true, filter: "isFile"}
         ]
       }
     }, 
@@ -147,13 +137,13 @@ module.exports = function(grunt) {
      'coffee:prod',
      'uglify:prod', 
      'less:prod', 
-     'copy:prod', 
+     'copy', 
      'replace:prod']);
 
   grunt.registerTask('dev', 'Generating a development build', 
     ['coffee:dev',
      'less:dev',
-     'copy:dev']);
+     'copy']);
 
   grunt.registerTask('deploy', 'Uploading to S3',
     ['default',
