@@ -10,12 +10,12 @@ module.exports = function(grunt) {
         src: 'build/js/main.js',
         dest: 'build/js/main.min.js',
         compress: true
-      },
-      dev: {
-        src: 'build/js/main.js',
-        dest: 'build/js/main.js',
-        beautify: true
       }
+      // dev: {
+      //   src: 'build/js/main.js',
+      //   dest: 'build/js/main.js',
+      //   beautify: true
+      // }
     },
     coffee: {
       prod: {
@@ -61,9 +61,11 @@ module.exports = function(grunt) {
         files: [
           {expand: true, src: "app/views/**", dest: "build/", flatten: true, filter: "isFile"},
           {expand: true, src: "bower_components/bootstrap/dist/css/bootstrap.min.css", dest: "build/stylesheets/", flatten: true},
-          {expand: true, src: "bower_components/bootstrap/dist/js/bootstrap.min.js", dest: "build/js/", flatten: true},
-          {expand: true, src: "bower_components/jquery/dist/jquery.min.js", dest: "build/js/", flatten: true},
-          {expand: true, src: "/bower_components/angular/angular.js", dest: "build/js/", flatten: true}
+          {expand: true, src: "bower_components/bootstrap/dist/js/bootstrap.js", dest: "build/js/", flatten: true},
+          {expand: true, src: "bower_components/jquery/dist/jquery.js", dest: "build/js/", flatten: true},
+          {expand: true, src: "bower_components/angular/angular.js", dest: "build/js/", flatten: true},
+          {expand: true, src: "bower_components/processing/processing.js", dest: "build/js/", flatten: true}
+
         ]
       },
       prod: {
@@ -71,7 +73,7 @@ module.exports = function(grunt) {
           {expand: true, src: "bower_components/bootstrap/dist/css/bootstrap.min.css", dest: "build/stylesheets/", flatten: true},
           {expand: true, src: "bower_components/bootstrap/dist/js/bootstrap.min.js", dest: "build/js/", flatten: true},
           {expand: true, src: "bower_components/jquery/dist/jquery.min.js", dest: "build/js/", flatten: true},
-          {expand: true, src: "/bower_components/angular/angular.min.js", dest: "build/js/", flatten: true},
+          {expand: true, src: "bower_components/angular/angular.min.js", dest: "build/js/", flatten: true},
           {expand: true, src: "app/views/**", dest: "build/", flatten: true, filter: "isFile"}
         ]
       }
@@ -94,6 +96,9 @@ module.exports = function(grunt) {
           },
           { from: "js/bootstrap.js",
             to: "js/bootstrap.min.js"
+          },
+          { from: "js/processing.js",
+            to: "js/processing.min.js"
           }
         ]
       }
@@ -146,7 +151,7 @@ module.exports = function(grunt) {
   grunt.registerTask('dev', 'Generating a development build', 
     ['clean',
      'coffee:dev',
-     'uglify:dev', 
+     // 'uglify:dev', 
      'less:dev',
      'copy:dev']);
 
