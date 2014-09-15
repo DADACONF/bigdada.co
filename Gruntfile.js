@@ -1,5 +1,4 @@
 module.exports = function(grunt) {
-
   // Project configuration.
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
@@ -63,15 +62,18 @@ module.exports = function(grunt) {
           {expand: true, src: "app/views/**", dest: "build/", flatten: true, filter: "isFile"},
           {expand: true, src: "bower_components/bootstrap/dist/css/bootstrap.min.css", dest: "build/stylesheets/", flatten: true},
           {expand: true, src: "bower_components/bootstrap/dist/js/bootstrap.min.js", dest: "build/js/", flatten: true},
-          {expand: true, src: "bower_components/jquery/dist/jquery.min.js", dest: "build/js/", flatten: true}
+          {expand: true, src: "bower_components/jquery/dist/jquery.min.js", dest: "build/js/", flatten: true},
+          {expand: true, src: "/bower_components/angular/angular.js", dest: "build/js/", flatten: true}
         ]
       },
       prod: {
         files: [
-        {expand: true, src: "bower_components/bootstrap/dist/css/bootstrap.min.css", dest: "build/stylesheets/", flatten: true},
-        {expand: true, src: "bower_components/bootstrap/dist/js/bootstrap.min.js", dest: "build/js/", flatten: true},
-        {expand: true, src: "bower_components/jquery/dist/jquery.min.js", dest: "build/js/", flatten: true},
-        {expand: true, src: "app/views/**", dest: "build/", flatten: true, filter: "isFile"}]
+          {expand: true, src: "bower_components/bootstrap/dist/css/bootstrap.min.css", dest: "build/stylesheets/", flatten: true},
+          {expand: true, src: "bower_components/bootstrap/dist/js/bootstrap.min.js", dest: "build/js/", flatten: true},
+          {expand: true, src: "bower_components/jquery/dist/jquery.min.js", dest: "build/js/", flatten: true},
+          {expand: true, src: "/bower_components/angular/angular.min.js", dest: "build/js/", flatten: true},
+          {expand: true, src: "app/views/**", dest: "build/", flatten: true, filter: "isFile"}
+        ]
       }
     }, 
     replace: {
@@ -83,6 +85,15 @@ module.exports = function(grunt) {
             to: "js/main.min.js"},
           { from: "stylesheets/main.css",
             to: "stylesheets/main.min.css"
+          },
+          { from: "js/jquery.js",
+            to: "js/jquery.min.js"
+          },
+          { from: "js/angular.js",
+            to: "js/angular.min.js"
+          },
+          { from: "js/bootstrap.js",
+            to: "js/bootstrap.min.js"
           }
         ]
       }
