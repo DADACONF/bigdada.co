@@ -8,14 +8,32 @@ module.exports = function(grunt) {
         banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
       },
       prod: {
-        src: 'app/assets/javascripts/main.js',
+        src: 'build/js/main.js',
         dest: 'build/js/main.min.js',
         compress: true
       },
       dev: {
-        src: 'app/assets/javascripts/main.js',
+        src: 'build/js/main.js',
         dest: 'build/js/main.js',
         beautify: true
+      }
+    },
+    coffee: {
+      prod: {
+        expand: true,
+        flatten: true,
+        cwd: 'app/assets/coffee',
+        src: ['*.coffee'],
+        dest: 'build/js/',
+        ext: '.js'
+      }, 
+      dev: {
+        expand: true,
+        flatten: true,
+        cwd: 'app/assets/coffee',
+        src: ['*.coffee'],
+        dest: 'build/js/',
+        ext: '.js'
       }
     },
     less: {
@@ -99,7 +117,7 @@ module.exports = function(grunt) {
 
   // Load the plugin that provides the "uglify" task.
   grunt.loadNpmTasks('grunt-contrib-uglify');
-  grunt.loadNpmTasks('grunt-contrib-requirejs');
+  grunt.loadNpmTasks('grunt-contrib-coffee');
   grunt.loadNpmTasks('grunt-contrib-less');
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-text-replace');
@@ -108,6 +126,7 @@ module.exports = function(grunt) {
   // Default task(s).
   grunt.registerTask('default', 'Building a production build', 
     ['clean',
+     'coffee:prod',
      'uglify:prod', 
      'less:prod', 
      'copy:prod', 
@@ -115,6 +134,7 @@ module.exports = function(grunt) {
 
   grunt.registerTask('dev', 'Generating a development build', 
     ['clean',
+     'coffee:dev',
      'uglify:dev', 
      'less:dev',
      'copy:dev']);
