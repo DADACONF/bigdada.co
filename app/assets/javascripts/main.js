@@ -15,7 +15,7 @@
     }
 
     function greyColor(idx) {
-        var palette = ["FFFFFF"];
+        var palette = ["#666666"];
         return palette[idx % palette.length];
     }
 
@@ -245,25 +245,13 @@
             });
         }
 
-        $("#spiral-btn").click(function() {
-            queueAnimation(spiralDrawing(canvas2DContext, xLayers, 0.05));
-        });
-        $("#wash-btn").click(function() {
-            queueAnimation(stripes(canvas2DContext, width, height, 20, 0.5));
-        });
-        $("#right-btn").click(function() {
-            queueAnimation(washRight(canvas2DContext, width, height, randColor(), 0.05));
-        });
-        $("#circles-btn").click(function() {
-            drawingQueue.push(washRight(canvas2DContext, width, height, greyColor(0), 0.06));
-            drawingQueue.push(circleSweep(canvas2DContext, 0.03, width, height, 1));
-            drawingQueue.push(washRight(canvas2DContext, width, height, greyColor(1), 0.07));
-            drawingQueue.push(circleSweep(canvas2DContext, 0.03, width, height, 2));
-            drawingQueue.push(washRight(canvas2DContext, width, height, greyColor(2), 0.08));
-            drawingQueue.push(circleSweep(canvas2DContext, 0.03, width, height, 3));
-            // drawingQueue.push(washRight(canvas2DContext, width, height, greyColor(3), 0.09));
-            // drawingQueue.push(circleSweep(canvas2DContext, 0.03, width, height, 4));
-            queueAnimation(circleSweep(canvas2DContext, 0.03, width, height, 0));
-        });
+
+        drawingQueue.push(washRight(canvas2DContext, width, height, greyColor(0), 0.06));
+        drawingQueue.push(circleSweep(canvas2DContext, 0.03, width, height, 1));
+        drawingQueue.push(washRight(canvas2DContext, width, height, greyColor(1), 0.07));
+        drawingQueue.push(circleSweep(canvas2DContext, 0.03, width, height, 2));
+        drawingQueue.push(washRight(canvas2DContext, width, height, greyColor(2), 0.08));
+        drawingQueue.push(circleSweep(canvas2DContext, 0.03, width, height, 3));
+        queueAnimation(circleSweep(canvas2DContext, 0.03, width, height, 0));
     });
 }());
