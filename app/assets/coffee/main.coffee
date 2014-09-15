@@ -39,5 +39,6 @@ dadaApp.controller 'SketchController', ($scope) =>
       sketch.background(255)
       drawCircle(sketch, circle) for circle in circles 
       fill = new Fill(255, 0, 0)
+      console.log("fucl")
       circle =  new Circle(80, fill, 255, 5, 50, 50)
       # drawCircle(sketch, circles[0])  

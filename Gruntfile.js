@@ -11,11 +11,6 @@ module.exports = function(grunt) {
         dest: 'build/js/main.min.js',
         compress: true
       }
-      // dev: {
-      //   src: 'build/js/main.js',
-      //   dest: 'build/js/main.js',
-      //   beautify: true
-      // }
     },
     coffee: {
       prod: {
@@ -128,10 +123,15 @@ module.exports = function(grunt) {
           }
         ]
       }
+    },
+    watch: {
+      coffee: {
+        files: ['app/assets/coffee/*.coffee', 'app/assets/stylesheets/*.less'],
+        tasks: ['dev']    
+      }
     }
   });
 
-  // Load the plugin that provides the "uglify" task.
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-coffee');
   grunt.loadNpmTasks('grunt-contrib-less');
@@ -139,6 +139,8 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-text-replace');
   grunt.loadNpmTasks('grunt-s3');
   grunt.loadNpmTasks('grunt-contrib-clean');
+  grunt.loadNpmTasks('grunt-contrib-watch');
+
   // Default task(s).
   grunt.registerTask('default', 'Building a production build', 
     ['clean',
@@ -149,9 +151,7 @@ module.exports = function(grunt) {
      'replace:prod']);
 
   grunt.registerTask('dev', 'Generating a development build', 
-    ['clean',
-     'coffee:dev',
-     // 'uglify:dev', 
+    ['coffee:dev',
      'less:dev',
      'copy:dev']);
 
