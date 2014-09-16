@@ -8,7 +8,8 @@ dadaApp.directive 'processing', () =>
 
 dadaApp.controller 'SketchController', ["$scope", ($scope) =>
   COLOR_RATIO = (2 * Math.PI) / 30.0
-  GRAVITY_VECTOR = new PVector(0, -0.005)  
+  GRAVITY_VECTOR = new PVector(0, -0.009)
+  BOUNCE_DECAY = 0.65  
   PADDING =  5
   class Fill
     constructor: (@r, @g, @b) -> 
@@ -20,8 +21,16 @@ dadaApp.controller 'SketchController', ["$scope", ($scope) =>
     constructor: (@radius, @fill, @stroke, @weight, @x, @y, @text, @velocityVector) -> 
 
     move: (time, sketch) ->
-      @x = sketch.constrain(@x + (@velocityVector.x * time), 0 + (@radius / 2) + PADDING, 960 - (@radius / 2) - PADDING)
-      @y = sketch.constrain(@y + (@velocityVector.y * time), 0 + (@radius / 2) + PADDING, 720 - (@radius / 2) - PADDING)
+      newX =  @x + (@velocityVector.x * time)
+      newY =  @y + (@velocityVector.y * time)
+      
+      yUpperbound = 0 + (@radius / 2) + PADDING
+      if newY >= 0 and newY <= yUpperbound
+        @velocityVector.rotate(Math.PI)
+        @velocityVector.mult(BOUNCE_DECAY)
+
+      @x = sketch.constrain(newX, 0 + (@radius / 2) + PADDING, 960 - (@radius / 2) - PADDING)
+      @y = sketch.constrain(newY, 0 + (@radius / 2) + PADDING, 720 - (@radius / 2) - PADDING)
 
     impulse: (forceVector, time, sketch) ->
       forceDelta = forceVector.get()
@@ -34,8 +43,8 @@ dadaApp.controller 'SketchController', ["$scope", ($scope) =>
   circles = for i in [0..6]
     fill = new Fill(0, 0, 0)
     y = 640
-    x = (120 * (i) + 60)
-    new Circle(115, fill, 1, 2, x, y, text.slice(i, i+1), new PVector(0,0))  
+    x = ((120 * i) + 60)
+    new Circle(110, fill, 1, 2, x, y, text.slice(i, i+1), new PVector(0,Math.random()))  
   
 
 
