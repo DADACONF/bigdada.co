@@ -7,28 +7,38 @@ dadaApp.directive 'processing', () =>
 
 
 dadaApp.controller 'SketchController', ["$scope", ($scope) =>
+  COLOR_RATIO = (2 * Math.PI) / 30.0
+  GRAVITY_VECTOR = new PVector(0, -0.00981)  
+  PADDING =  5
   class Fill
-    constructor: (@r, @g, @b) ->
+    constructor: (@r, @g, @b) -> 
+
+  class Force
+    constructor: (@theta, @acceleration) ->
 
   class Circle 
-    constructor: (@radius, @fill, @stroke, @weight, @x, @y, @text) ->
+    constructor: (@radius, @fill, @stroke, @weight, @x, @y, @text, @velocityVector) -> 
 
-  blackFill = () => new Fill(240, 240, 240)
-  whiteFill = () => new Fill(10, 10, 10)
-  black = true
-  text = "BIG*DADA"
-  circles = for i in [0..7]
-    fill = switch
-      when i < 4 and i % 2 is 0 then whiteFill()
-      when i < 4 and i % 2 is 1 then blackFill()
-      when i >= 4 and i % 2 is 1 then whiteFill()
-      else blackFill()
-    y = if i <= 3 then 60 else 180
-    x = (120 * (i % 4) + 60)
-    new Circle(115, fill, 1, 2, x, y, text.slice(i, i+1))  
+    move: (time, sketch) ->
+      @x = sketch.constrain(@x + (@velocityVector.x * time), 0 + (@radius / 2) + PADDING, 960 - (@radius / 2) - PADDING)
+      @y = sketch.constrain(@y + (@velocityVector.y * time), 0 + (@radius / 2) + PADDING, 720 - (@radius / 2) - PADDING)
+
+    impulse: (forceVector, time, sketch) ->
+      forceDelta = forceVector.get()
+      forceDelta.mult(time)
+      @velocityVector.add(forceDelta)
+      this.move(time, sketch)
+
+  text = "BIGDADA"
+
+  circles = for i in [0..6]
+    fill = new Fill(0, 0, 0)
+    y = 640
+    x = (120 * (i) + 60)
+    new Circle(115, fill, 1, 2, x, y, text.slice(i, i+1), new PVector(0,0))  
   
-  COLOR_RATIO = (2 * Math.PI) / 30.0  
-    
+
+
   colorSin = (base, period) => 
     (time) => 
       value = ((period * time) + base) * COLOR_RATIO
@@ -42,6 +52,7 @@ dadaApp.controller 'SketchController', ["$scope", ($scope) =>
     red = redSin(frame)
     green = greenSin(frame)
     blue = blueSin(frame)
+    circle.impulse(GRAVITY_VECTOR, 10, sketch)
     sketch.strokeWeight(circle.weight)
     sketch.stroke(circle.stroke)
     sketch.fill(red, green, blue)
@@ -50,16 +61,15 @@ dadaApp.controller 'SketchController', ["$scope", ($scope) =>
     sketch.textSize(64)
     sketch.text(circle.text, circle.x - 20, circle.y + 20)
 
-    
   $scope.sketch = (sketch) => 
     lastFrame = 0
 
     sketch.setup = () =>
-      sketch.size(480, 240)
+      sketch.size(960, 720)
       sketch.frameRate(30)
     
     sketch.draw = () =>
-      # frameDelta = sketch.frameCount - lastFrame  
+      frameDelta = sketch.frameCount - lastFrame  
       sketch.background(210)
       drawCircle(sketch, circle, sketch.frameCount) for circle in circles 
 ]
