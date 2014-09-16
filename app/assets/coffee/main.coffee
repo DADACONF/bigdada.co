@@ -8,7 +8,7 @@ dadaApp.directive 'processing', () =>
 
 dadaApp.controller 'SketchController', ["$scope", ($scope) =>
   COLOR_RATIO = (2 * Math.PI) / 30.0
-  GRAVITY_VECTOR = new PVector(0, -0.00981)  
+  GRAVITY_VECTOR = new PVector(0, -0.005)  
   PADDING =  5
   class Fill
     constructor: (@r, @g, @b) -> 
@@ -44,9 +44,9 @@ dadaApp.controller 'SketchController', ["$scope", ($scope) =>
       value = ((period * time) + base) * COLOR_RATIO
       Math.sin(value) * 255.0
 
-  redSin = colorSin(200, .17)
-  greenSin = colorSin(200, .07)
-  blueSin = colorSin(200, .11)
+  redSin = colorSin(200, .34)
+  greenSin = colorSin(200, .14)
+  blueSin = colorSin(200, .22)
 
   drawCircle = (sketch, circle, frame) =>
     red = redSin(frame)
