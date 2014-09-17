@@ -11,6 +11,8 @@ dadaApp.controller 'SketchController', ["$scope", ($scope) =>
   GRAVITY_VECTOR = new PVector(0, -0.009)
   BOUNCE_DECAY = 0.65  
   PADDING =  5
+  HORIZONTAL = new PVector(-1.0,0)
+  VERTICAL = new PVector(0,1)
   class Fill
     constructor: (@r, @g, @b) -> 
 
@@ -23,14 +25,25 @@ dadaApp.controller 'SketchController', ["$scope", ($scope) =>
     move: (time, sketch) ->
       newX =  @x + (@velocityVector.x * time)
       newY =  @y + (@velocityVector.y * time)
-      
+      xLeftbound = 0 + (@radius / 2) + PADDING
+      xRightbound = 960 - (@radius / 2) - PADDING
       yUpperbound = 0 + (@radius / 2) + PADDING
-      if newY >= 0 and newY <= yUpperbound
-        @velocityVector.rotate(Math.PI)
-        @velocityVector.mult(BOUNCE_DECAY)
+      yLowerbound = 720 - (@radius / 2) - PADDING
 
-      @x = sketch.constrain(newX, 0 + (@radius / 2) + PADDING, 960 - (@radius / 2) - PADDING)
-      @y = sketch.constrain(newY, 0 + (@radius / 2) + PADDING, 720 - (@radius / 2) - PADDING)
+      switch
+        when newY <= yUpperbound or newY >= yLowerbound
+          incidence = PVector.angleBetween(@velocityVector, VERTICAL)
+          incidence = if @velocityVector.x < 0 then -1 * incidence else incidence
+          @velocityVector.rotate(Math.PI + 2 * incidence)
+          @velocityVector.mult(BOUNCE_DECAY)
+        when newX <= xLeftbound or newX >= xRightbound
+          incidence = PVector.angleBetween(@velocityVector, HORIZONTAL)
+          incidence = if @velocityVector.y > 0 then -1 * incidence else incidence
+          @velocityVector.rotate(-1.0 * (Math.PI + 2 * incidence))
+          @velocityVector.mult(BOUNCE_DECAY)
+
+      @x = sketch.constrain(newX, xLeftbound, xRightbound)
+      @y = sketch.constrain(newY, yUpperbound, yLowerbound)
 
     impulse: (forceVector, time, sketch) ->
       forceDelta = forceVector.get()
@@ -42,9 +55,9 @@ dadaApp.controller 'SketchController', ["$scope", ($scope) =>
 
   circles = for i in [0..6]
     fill = new Fill(0, 0, 0)
-    y = 640
+    y = 600
     x = ((120 * i) + 60)
-    new Circle(110, fill, 1, 2, x, y, text.slice(i, i+1), new PVector(0,Math.random()))  
+    new Circle(90, fill, 1, 2, x, y, text.slice(i, i+1), new PVector((Math.random() - 0.5)*2, Math.random()))
   
 
 
