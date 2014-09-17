@@ -2,10 +2,18 @@
 
 sketch = angular.module('sketch', [])
 
-sketch.directive 'processing', () =>
+sketch.directive 'processing', ['sketchObj', (sketchObj) =>
   scope: true
   link: (scope, iElement, iAttrs) => 
-    scope.$sketch = new Processing(iElement[0], scope[iAttrs.processing])
+    scope.$sketch = new sketchObj.Sketch(new Processing(iElement[0], scope[iAttrs.processing]))
+]
+
+sketch.factory 'sketchObj', () => 
+	class Sketch extends Processing
+		constructor: (@canvas, @process) ->
+			super(@canvas, @process)
+	sketchObj = 		
+		Sketch: Sketch		
 
 sketch.factory('fills', () =>
   COLOR_RATIO = (2 * Math.PI) / 30.0
@@ -19,7 +27,7 @@ sketch.factory('fills', () =>
 sketch.factory('shapes', () =>  
 	HORIZONTAL = new PVector(-1.0,0)
 	VERTICAL = new PVector(0,1)
-	PADDING = 5
+	PADDING = 1
 	BOUNCE_DECAY = 0.65
 
 	class Fill
