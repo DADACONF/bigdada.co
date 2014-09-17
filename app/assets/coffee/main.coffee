@@ -1,18 +1,13 @@
-dadaApp = angular.module('dada', []);
+dadaApp = angular.module('dada', ['sketch'])
 
-dadaApp.directive 'processing', () =>
-  scope: true
-  link: (scope, iElement, iAttrs) => 
-    scope.$sketch = new Processing(iElement[0], scope[iAttrs.processing])
-
-
-dadaApp.controller 'SketchController', ["$scope", ($scope) =>
-  COLOR_RATIO = (2 * Math.PI) / 30.0
+dadaApp.controller 'SketchController', ["$scope", "fills", ($scope, fills) =>
   GRAVITY_VECTOR = new PVector(0, -0.009)
   BOUNCE_DECAY = 0.65  
   PADDING =  5
   HORIZONTAL = new PVector(-1.0,0)
   VERTICAL = new PVector(0,1)
+  WIDTH = 480
+  HEIGHT = 720
   class Fill
     constructor: (@r, @g, @b) -> 
 
@@ -26,9 +21,9 @@ dadaApp.controller 'SketchController', ["$scope", ($scope) =>
       newX =  @x + (@velocityVector.x * time)
       newY =  @y + (@velocityVector.y * time)
       xLeftbound = 0 + (@radius / 2) + PADDING
-      xRightbound = 960 - (@radius / 2) - PADDING
+      xRightbound = WIDTH - (@radius / 2) - PADDING
       yUpperbound = 0 + (@radius / 2) + PADDING
-      yLowerbound = 720 - (@radius / 2) - PADDING
+      yLowerbound = HEIGHT - (@radius / 2) - PADDING
 
       switch
         when newY <= yUpperbound or newY >= yLowerbound
@@ -56,19 +51,14 @@ dadaApp.controller 'SketchController', ["$scope", ($scope) =>
   circles = for i in [0..6]
     fill = new Fill(0, 0, 0)
     y = 600
-    x = ((120 * i) + 60)
+    x = WIDTH / 2.0
+    # x = ((120 * i) + 60)
     new Circle(90, fill, 1, 2, x, y, text.slice(i, i+1), new PVector((Math.random() - 0.5)*2, Math.random()))
   
 
-
-  colorSin = (base, period) => 
-    (time) => 
-      value = ((period * time) + base) * COLOR_RATIO
-      Math.sin(value) * 255.0
-
-  redSin = colorSin(200, .34)
-  greenSin = colorSin(200, .14)
-  blueSin = colorSin(200, .22)
+  redSin = fills.colorSin(200, .34)
+  greenSin = fills.colorSin(200, .14)
+  blueSin = fills.colorSin(200, .22)
 
   drawCircle = (sketch, circle, frame) =>
     red = redSin(frame)
@@ -87,7 +77,7 @@ dadaApp.controller 'SketchController', ["$scope", ($scope) =>
     lastFrame = 0
 
     sketch.setup = () =>
-      sketch.size(960, 720)
+      sketch.size(WIDTH, HEIGHT)
       sketch.frameRate(30)
     
     sketch.draw = () =>
