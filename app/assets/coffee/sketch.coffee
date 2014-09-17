@@ -24,9 +24,6 @@ sketch.factory('shapes', () =>
 
 	class Fill
     constructor: (@r, @g, @b) -> 
-	
-	class Force
-    constructor: (@theta, @acceleration) ->
 
   class Circle
     constructor: (@radius, @fill, @stroke, @weight, @x, @y, @text, @velocityVector) -> 
@@ -38,7 +35,6 @@ sketch.factory('shapes', () =>
       xRightbound = sketch.width- (@radius / 2) - PADDING
       yUpperbound = 0 + (@radius / 2) + PADDING
       yLowerbound = sketch.height - (@radius / 2) - PADDING
-
       switch
         when newY <= yUpperbound or newY >= yLowerbound
           incidence = PVector.angleBetween(@velocityVector, VERTICAL)
@@ -61,7 +57,6 @@ sketch.factory('shapes', () =>
       this.move(time, sketch)
 
   shapes = 
-  	Force: Force
   	Circle: Circle
   	Fill: Fill
 )
