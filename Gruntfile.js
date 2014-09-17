@@ -2,12 +2,18 @@ module.exports = function(grunt) {
   // Project configuration.
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
+    concat: {
+      prod: {
+        src: ['build/js/sketch.js','build/js/main.js'],
+        dest: 'build/js/main.js'
+      }
+    },
     uglify: {
       options: {
         banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
       },
       prod: {
-        src: 'build/js/main.js',
+        src: ['build/js/main.js'],
         dest: 'build/js/main.min.js',
         compress: true
       }
@@ -52,15 +58,30 @@ module.exports = function(grunt) {
       }
     },
     copy: {
-      build: {
+      dev: {
         files: [  
-          {expand: true, src: "app/views/**", dest: "build/", flatten: true, filter: "isFile"},
           {expand: true, src: "bower_components/bootstrap/dist/css/bootstrap.min.css", dest: "build/stylesheets/", flatten: true},
-          {expand: true, src: "bower_components/bootstrap/dist/js/bootstrap.js", dest: "build/js/", flatten: true},
-          {expand: true, src: "bower_components/jquery/dist/jquery.js", dest: "build/js/", flatten: true},
-          {expand: true, src: "bower_components/angular/angular.js", dest: "build/js/", flatten: true},
-          {expand: true, src: "bower_components/processing/processing.js", dest: "build/js/", flatten: true}
+          {expand: true, src: "bower_components/bootstrap/dist/js/bootstrap.js", dest: "build/js/libs", flatten: true},
+          {expand: true, src: "bower_components/jquery/dist/jquery.js", dest: "build/js/libs", flatten: true},
+          {expand: true, src: "bower_components/angular/angular.js", dest: "build/js/libs", flatten: true},
+          {expand: true, src: "bower_components/processing/processing.js", dest: "build/js/libs", flatten: true}
         ]
+      },
+      prod: {
+        files: [  
+          {expand: true, src: "bower_components/bootstrap/dist/css/bootstrap.min.css", dest: "build/stylesheets/", flatten: true},
+          {expand: true, src: "bower_components/bootstrap/dist/js/bootstrap.min.js", dest: "build/js/libs", flatten: true},
+          {expand: true, src: "bower_components/jquery/dist/jquery.min.js", dest: "build/js/libs", flatten: true},
+          {expand: true, src: "bower_components/angular/angular.min.js", dest: "build/js/libs", flatten: true},
+          {expand: true, src: "bower_components/processing/processing.min.js", dest: "build/js/libs", flatten: true}
+        ]
+      }
+    },
+    processhtml: {
+      prod: {
+        files: {
+          'build/index.html': ['app/views/index.html']
+        }
       }
     }, 
     replace: {
@@ -68,22 +89,20 @@ module.exports = function(grunt) {
         src: ["build/index.html"],
         overwrite: true,
         replacements: [
-          { from: "js/main.js",
-            to: "js/main.min.js"},
           { from: "stylesheets/main.css",
             to: "stylesheets/main.min.css"
           },
-          { from: "js/jquery.js",
-            to: "js/jquery.min.js"
+          { from: "js/libs/jquery.js",
+            to: "js/libs/jquery.min.js"
           },
-          { from: "js/angular.js",
-            to: "js/angular.min.js"
+          { from: "js/libs/angular.js",
+            to: "js/libs/angular.min.js"
           },
-          { from: "js/bootstrap.js",
-            to: "js/bootstrap.min.js"
+          { from: "js/libs/bootstrap.js",
+            to: "js/libs/bootstrap.min.js"
           },
-          { from: "js/processing.js",
-            to: "js/processing.min.js"
+          { from: "js/libs/processing.js",
+            to: "js/libs/processing.min.js"
           }
         ]
       }
@@ -104,8 +123,12 @@ module.exports = function(grunt) {
             dest: ''
           },
           {
-            src: 'build/js/*',
+            src: 'build/js/*.min.js',
             dest: 'js/'
+          },
+          {
+            src: 'build/js/libs/*.min.js',
+            dest: 'js/libs/'
           },
           {
             src: 'build/stylesheets/*',
@@ -124,26 +147,30 @@ module.exports = function(grunt) {
 
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-coffee');
+  grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-less');
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-text-replace');
   grunt.loadNpmTasks('grunt-s3');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-processhtml');
 
   // Default task(s).
   grunt.registerTask('default', 'Building a production build', 
     ['clean',
      'coffee:prod',
+     'concat:prod',
      'uglify:prod', 
      'less:prod', 
-     'copy', 
+     'copy:prod',
+     'processhtml:prod', 
      'replace:prod']);
 
   grunt.registerTask('dev', 'Generating a development build', 
     ['coffee:dev',
      'less:dev',
-     'copy']);
+     'copy:dev']);
 
   grunt.registerTask('deploy', 'Uploading to S3',
     ['default',
