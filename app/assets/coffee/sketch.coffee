@@ -34,15 +34,16 @@ sketch.factory('shapes', () =>
     constructor: (@r, @g, @b) -> 
 
   class Circle
-    constructor: (@radius, @fill, @stroke, @weight, @x, @y, @text, @velocityVector) -> 
+    constructor: (@diameter, @fill, @stroke, @weight, @x, @y, @text, @velocityVector) -> 
 
     move: (time, sketch) ->
       newX =  @x + (@velocityVector.x * time)
       newY =  @y + (@velocityVector.y * time)
-      xLeftbound = 0 + (@radius / 2) + PADDING
-      xRightbound = sketch.width- (@radius / 2) - PADDING
-      yUpperbound = 0 + (@radius / 2) + PADDING
-      yLowerbound = sketch.height - (@radius / 2) - PADDING
+      xLeftbound = 0 + (@diameter / 2) + PADDING
+      xRightbound = sketch.width- (@diameter / 2) - PADDING
+      yUpperbound = 0 + (@diameter / 2) + PADDING
+      yLowerbound = sketch.height - (@diameter / 2) - PADDING
+      #move code that changes directions outside of this. 
       switch
         when newY <= yUpperbound or newY >= yLowerbound
           incidence = PVector.angleBetween(@velocityVector, VERTICAL)
@@ -57,6 +58,13 @@ sketch.factory('shapes', () =>
 
       @x = sketch.constrain(newX, xLeftbound, xRightbound)
       @y = sketch.constrain(newY, yUpperbound, yLowerbound)
+
+    boundingRectangle: () ->
+    	left: @x - (@diameter / 2)
+    	top: @y - (@diameter / 2)
+    	width: @diameter 
+    	height: @diameter   
+    	circle: this
 
     impulse: (forceVector, time, sketch) ->
       forceDelta = forceVector.get()

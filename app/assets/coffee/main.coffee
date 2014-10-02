@@ -16,18 +16,36 @@ dadaApp.controller 'SketchController', ["$scope", "fills", "shapes", ($scope, fi
   greenSin = fills.colorSin(200, .14)
   blueSin = fills.colorSin(200, .22)
 
-  drawCircle = (sketch, circle, frame) =>
+  tree = GiantQuadtree.create(WIDTH, HEIGHT)
+
+
+  drawCircle = (sketch, circle, frame, tree) =>
     red = redSin(frame)
     green = greenSin(frame)
     blue = blueSin(frame)
     circle.impulse(GRAVITY_VECTOR, 10, sketch)
+
     sketch.strokeWeight(circle.weight)
     sketch.stroke(circle.stroke)
     sketch.fill(red, green, blue)
-    sketch.ellipse(circle.x, circle.y, circle.radius, circle.radius)
+    sketch.ellipse(circle.x, circle.y, circle.diameter, circle.diameter)
     sketch.fill(255 - blue, 255 - green, 255.0 - red)
     sketch.textSize(64)
     sketch.text(circle.text, circle.x - 20, circle.y + 20)
+    tree.insert(circle.boundingRectangle())
+
+  findCollisions = (circle, tree) =>
+    rect = circle.boundingRectangle()
+    left = rect.left
+    top = rect.top
+    width = rect.width 
+    height = rect.height 
+    collisions = tree.get(left, top, width, height)
+    for collision in collisions
+      if(collision.circle isnt circle)
+        console.log("collision!")
+        #TODO reflection! 
+
 
   $scope.flip = () =>
     GRAVITY_VECTOR.rotate((Math.PI / 2))  
@@ -42,16 +60,8 @@ dadaApp.controller 'SketchController', ["$scope", "fills", "shapes", ($scope, fi
     sketch.draw = () =>
       frameDelta = sketch.frameCount - lastFrame  
       # Draw background first
-      # Draw angles
       sketch.background(235)
-      lines =  8
-      for i in [0..lines]
-        deltaX = sketch.width / lines
-        deltaY = sketch.height / 40.0
-        startX = deltaX * i
-        for j in [0..40]
-          sketch.stroke(50, 50, 50)
-          sketch.line(startX, sketch.height - j * (deltaY), startX + (deltaX * j), sketch.height - j * (deltaY + 1))
-
-      drawCircle(sketch, circle, sketch.frameCount) for circle in circles 
+      tree.reset()
+      drawCircle(sketch, circle, sketch.frameCount, tree) for circle in circles
+      findCollisions(circle, tree) for circle in circles
 ]

@@ -65,7 +65,8 @@ module.exports = function(grunt) {
           {expand: true, src: "bower_components/bootstrap/dist/js/bootstrap.js", dest: "build/js/libs", flatten: true},
           {expand: true, src: "bower_components/jquery/dist/jquery.js", dest: "build/js/libs", flatten: true},
           {expand: true, src: "bower_components/angular/angular.js", dest: "build/js/libs", flatten: true},
-          {expand: true, src: "bower_components/processing/processing.js", dest: "build/js/libs", flatten: true}
+          {expand: true, src: "bower_components/processing/processing.js", dest: "build/js/libs", flatten: true},
+          {expand: true, src: "bower_components/giant-quadtree/dist/GiantQuadtree.js", dest: "build/js/libs", flatten: true}
         ]
       },
       prod: {
@@ -74,7 +75,8 @@ module.exports = function(grunt) {
           {expand: true, src: "bower_components/bootstrap/dist/js/bootstrap.min.js", dest: "build/js/libs", flatten: true},
           {expand: true, src: "bower_components/jquery/dist/jquery.min.js", dest: "build/js/libs", flatten: true},
           {expand: true, src: "bower_components/angular/angular.min.js", dest: "build/js/libs", flatten: true},
-          {expand: true, src: "bower_components/processing/processing.min.js", dest: "build/js/libs", flatten: true}
+          {expand: true, src: "bower_components/processing/processing.min.js", dest: "build/js/libs", flatten: true},
+          {expand: true, src: "bower_components/giant-quadtree/dist/GiantQuadtree.min.js", dest: "build/js/libs", flatten: true}
         ]
       }
     },
