@@ -106,6 +106,9 @@ module.exports = function(grunt) {
           },
           { from: "js/libs/processing.js",
             to: "js/libs/processing.min.js"
+          },
+          { from: "js/libs/GiantQuadtree.js",
+            to: "js/libs/GiantQuadtree.min.js"
           }
         ]
       }

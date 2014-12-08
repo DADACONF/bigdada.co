@@ -1,26 +1,33 @@
 dadaApp = angular.module('dada', ['sketch'])
 
-dadaApp.controller 'SketchController', ["$scope", "fills", "shapes", ($scope, fills, shapes) =>
+dadaApp.controller 'SketchController', ["$scope", "$window", "fills", "shapes", ($scope, $window, fills, shapes) =>
   GRAVITY_VECTOR = new PVector(0, -0.009)
   container = $(".canvas-container")
   canvas = $("#screen")
-  WIDTH =  $(container).width()
-  HEIGHT = $(container).height() - 10
+  screen = 
+    width: $(container).width()
+    height: $(container).height() - 10
 
   text = "BIGDADA"
 
   circles = for i in [0..6]
     fill = new shapes.Fill(0, 0, 0)
     y = 600
-    x = (((WIDTH / 7.0) * i) + (WIDTH / 15.0))
+    x = (((screen.width / 7.0) * i) + (screen.width / 15.0))
     new shapes.Circle(70, fill, 1, 2, x, y, text.slice(i, i+1), new PVector(0, Math.random()))
   
   redSin = fills.colorSin(200, .34)
   greenSin = fills.colorSin(200, .14)
   blueSin = fills.colorSin(200, .22)
 
-  tree = GiantQuadtree.create(WIDTH, HEIGHT)
+  tree = GiantQuadtree.create(screen.width, screen.height)
 
+  setWidthAndHeight = (sketch) =>
+    screen.width = $(container).width()
+    screen.height = $(container).height() - 10
+    canvas.attr('width', screen.width)
+    canvas.attr('height', screen.height)
+    sketch.size(screen.width, screen.height)    
 
 
   drawCircle = (sketch, circle, frame, tree) =>
@@ -50,7 +57,6 @@ dadaApp.controller 'SketchController', ["$scope", "fills", "shapes", ($scope, fi
         console.log("collision!")
         #TODO reflection! 
 
-
   $scope.flip = () =>
     GRAVITY_VECTOR.rotate((Math.PI / 2))  
   # the function that is called to bootstrap the sketch process form the processing directive
@@ -58,10 +64,10 @@ dadaApp.controller 'SketchController', ["$scope", "fills", "shapes", ($scope, fi
     lastFrame = 0
 
     sketch.setup = () =>  
-      canvas.attr('width', WIDTH)
-      canvas.attr('height', HEIGHT)
-      console.log("w: " + WIDTH + " height: "+ HEIGHT)
-      sketch.size(WIDTH, HEIGHT)
+      setWidthAndHeight(sketch)
+      $($window).resize(() => 
+        setWidthAndHeight(sketch)
+      )
       sketch.frameRate(30)
     
     sketch.draw = () =>
