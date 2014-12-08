@@ -61,18 +61,31 @@ dadaApp.controller 'SketchController', ["$scope", "$window", "fills", "shapes", 
         collision.circle.shrink()
         #TODO reflection! 
 
-  $scope.flip = () =>
-    GRAVITY_VECTOR.rotate((Math.PI / 2))  
+  randomGravity = () ->
+    seed = Math.random() * 4
+    if seed < 1
+      0
+    else if seed < 2 and seed > 1
+      Math.PI / 2
+    else if seed < 3 and seed > 2
+      Math.PI 
+    else 
+      3 * (Math.PI / 2)
+
+  $scope.dada = ($event) =>
+    newGravity = randomGravity()
+    GRAVITY_VECTOR.set(0.009*Math.cos(newGravity), -0.009*Math.sin(newGravity)) 
+    clickX = $event.offsetX
+    clickY = $event.offsetY
     newCircle = new shapes.Circle(
       70, 
       new shapes.Fill(0,Math.random(),0), 
       1, 
       2, 
-      screen.width / 2, 
-      screen.height / 2, 
+      clickX, 
+      clickY, 
       text.slice(textIndex, textIndex+1), 
-      new PVector(0, Math.random()))
-    
+      new PVector(0, 0))
     circles.push(newCircle)
     textIndex = (textIndex + 1) % 7
 
@@ -90,7 +103,7 @@ dadaApp.controller 'SketchController', ["$scope", "$window", "fills", "shapes", 
     sketch.draw = () =>
       frameDelta = sketch.frameCount - lastFrame  
       # Draw background first
-      sketch.background(greenSin(sketch.frameCount))
+      sketch.background(230,230,0)
       tree.reset()
       circles = circles.filter((circle) -> circle.diameter >= 5)
       drawCircle(sketch, circle, sketch.frameCount, tree) for circle in circles
