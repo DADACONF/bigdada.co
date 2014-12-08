@@ -16,7 +16,7 @@ dadaApp.controller 'SketchController', ["$scope", "$window", "fills", "shapes", 
   circles = for i in [0..6]
     fill = new shapes.Fill(0, 0, 0)
     y = screen.height * .75
-    x = (((screen.width / 7.0) * i) + (screen.width / 15.0))
+    x = (((screen.width / 11.0) * (i + 2)) + (screen.width / 15.0))
     new shapes.Circle(70, fill, 1, 2, x, y, text.slice(i, i+1), new PVector(0, Math.random()))
   
   redSin = fills.colorSin(200, .34)
@@ -38,12 +38,8 @@ dadaApp.controller 'SketchController', ["$scope", "$window", "fills", "shapes", 
     sketch.size(screen.width, screen.height)    
 
 
-  drawCircle = (sketch, circle, frame, tree) =>
-    red = redSin(frame)
-    green = greenSin(frame)
-    blue = blueSin(frame)
+  drawCircle = (sketch, circle, frame, tree, red, green, blue) =>
     circle.impulse(GRAVITY_VECTOR, 10, sketch)
-
     sketch.strokeWeight(circle.weight)
     sketch.stroke(circle.stroke)
     sketch.fill(red, green, blue)
@@ -68,7 +64,7 @@ dadaApp.controller 'SketchController', ["$scope", "$window", "fills", "shapes", 
         #TODO reflection! 
 
   randomGravity = () ->
-    seed = Math.random() * 2
+    seed = Math.random() * 4
     if seed < 1
       0
     else if seed < 2 and seed > 1
@@ -108,7 +104,7 @@ dadaApp.controller 'SketchController', ["$scope", "$window", "fills", "shapes", 
     g = bgSeed * 210
     b = bgSeed * 90  
     sketch.background(bgRedSin(frame), g + 40, bgBlueSin(frame))  
-    sketch.textSize(screen.height / 6) # 1/3 or canvas height
+    sketch.textSize(screen.height / 7)
     sketch.fill(255 - r, g * 2/3, 255)
     # sketch.text("BIG DADA", screen.width / 22, screen.height * 4 / 6) 
   # the function that is called to bootstrap the sketch process form the processing directive
@@ -124,10 +120,12 @@ dadaApp.controller 'SketchController', ["$scope", "$window", "fills", "shapes", 
     
     sketch.draw = () =>
       frameDelta = sketch.frameCount - lastFrame  
-      # Draw background first
       tree.reset()
       textFlip(sketch, frameDelta)
-      circles = circles.filter((circle) -> circle.diameter >= 5)
-      drawCircle(sketch, circle, sketch.frameCount, tree) for circle in circles
+      circles = circles.filter((circle) -> circle.diameter >= 10)
+      red = redSin(sketch.frameCount)
+      green = greenSin(sketch.frameCount)
+      blue = blueSin(sketch.frameCount)
+      drawCircle(sketch, circle, sketch.frameCount, tree, red, green, blue) for circle in circles
       findCollisions(circle, tree) for circle in circles
 ]
