@@ -2,8 +2,11 @@ dadaApp = angular.module('dada', ['sketch'])
 
 dadaApp.controller 'SketchController', ["$scope", "fills", "shapes", ($scope, fills, shapes) =>
   GRAVITY_VECTOR = new PVector(0, -0.009)
-  WIDTH = 600
-  HEIGHT = 720
+  container = $(".canvas-container")
+  canvas = $("#screen")
+  WIDTH =  $(container).width()
+  HEIGHT = $(container).height() - 10
+
   text = "BIGDADA"
 
   circles = for i in [0..6]
@@ -17,6 +20,7 @@ dadaApp.controller 'SketchController', ["$scope", "fills", "shapes", ($scope, fi
   blueSin = fills.colorSin(200, .22)
 
   tree = GiantQuadtree.create(WIDTH, HEIGHT)
+
 
 
   drawCircle = (sketch, circle, frame, tree) =>
@@ -49,11 +53,14 @@ dadaApp.controller 'SketchController', ["$scope", "fills", "shapes", ($scope, fi
 
   $scope.flip = () =>
     GRAVITY_VECTOR.rotate((Math.PI / 2))  
-
-  $scope.sketch = (sketch) => 
+  # the function that is called to bootstrap the sketch process form the processing directive
+  $scope.circleAnimation = (sketch) => 
     lastFrame = 0
 
-    sketch.setup = () =>
+    sketch.setup = () =>  
+      canvas.attr('width', WIDTH)
+      canvas.attr('height', HEIGHT)
+      console.log("w: " + WIDTH + " height: "+ HEIGHT)
       sketch.size(WIDTH, HEIGHT)
       sketch.frameRate(30)
     

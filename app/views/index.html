@@ -17,11 +17,9 @@
   <body>
     <div class="container">
       <div class="row">
-        <div class="col-md-4 col-md-offset-2">
+        <div class="col-md-8 col-md-offset-2 canvas-container">
           <div ng-controller="SketchController">
-            <div class="canvas-container">
-              <canvas id="screen" processing="sketch" ng-click="flip()"/>
-            </div>    
+            <canvas id="screen" processing="circleAnimation" ng-click="flip()"/>
           </div>
         </div>
       </div>            
