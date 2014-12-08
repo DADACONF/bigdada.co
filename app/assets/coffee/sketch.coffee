@@ -72,6 +72,9 @@ sketch.factory('shapes', () =>
       @velocityVector.add(forceDelta)
       this.move(time, sketch)
 
+    shrink: () =>
+      @diameter = .99 * @diameter
+
   shapes = 
   	Circle: Circle
   	Fill: Fill

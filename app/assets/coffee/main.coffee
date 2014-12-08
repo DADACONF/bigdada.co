@@ -12,7 +12,7 @@ dadaApp.controller 'SketchController', ["$scope", "$window", "fills", "shapes", 
 
   circles = for i in [0..6]
     fill = new shapes.Fill(0, 0, 0)
-    y = 600
+    y = screen.height * .75
     x = (((screen.width / 7.0) * i) + (screen.width / 15.0))
     new shapes.Circle(70, fill, 1, 2, x, y, text.slice(i, i+1), new PVector(0, Math.random()))
   
@@ -21,6 +21,8 @@ dadaApp.controller 'SketchController', ["$scope", "$window", "fills", "shapes", 
   blueSin = fills.colorSin(200, .22)
 
   tree = GiantQuadtree.create(screen.width, screen.height)
+
+  textIndex = 0
 
   setWidthAndHeight = (sketch) =>
     screen.width = $(container).width()
@@ -41,8 +43,8 @@ dadaApp.controller 'SketchController', ["$scope", "$window", "fills", "shapes", 
     sketch.fill(red, green, blue)
     sketch.ellipse(circle.x, circle.y, circle.diameter, circle.diameter)
     sketch.fill(255 - blue, 255 - green, 255.0 - red)
-    sketch.textSize(64)
-    sketch.text(circle.text, circle.x - 20, circle.y + 20)
+    sketch.textSize(circle.diameter * .8)
+    sketch.text(circle.text, circle.x - (circle.diameter / 4), circle.y + (circle.diameter / 3))
     tree.insert(circle.boundingRectangle())
 
   findCollisions = (circle, tree) =>
@@ -54,11 +56,26 @@ dadaApp.controller 'SketchController', ["$scope", "$window", "fills", "shapes", 
     collisions = tree.get(left, top, width, height)
     for collision in collisions
       if(collision.circle isnt circle)
-        console.log("collision!")
+        # console.log("collision!")
+        circle.shrink()
+        collision.circle.shrink()
         #TODO reflection! 
 
   $scope.flip = () =>
     GRAVITY_VECTOR.rotate((Math.PI / 2))  
+    newCircle = new shapes.Circle(
+      70, 
+      new shapes.Fill(0,Math.random(),0), 
+      1, 
+      2, 
+      screen.width / 2, 
+      screen.height / 2, 
+      text.slice(textIndex, textIndex+1), 
+      new PVector(0, Math.random()))
+    
+    circles.push(newCircle)
+    textIndex = (textIndex + 1) % 7
+
   # the function that is called to bootstrap the sketch process form the processing directive
   $scope.circleAnimation = (sketch) => 
     lastFrame = 0
@@ -73,8 +90,9 @@ dadaApp.controller 'SketchController', ["$scope", "$window", "fills", "shapes", 
     sketch.draw = () =>
       frameDelta = sketch.frameCount - lastFrame  
       # Draw background first
-      sketch.background(235)
+      sketch.background(greenSin(sketch.frameCount))
       tree.reset()
+      circles = circles.filter((circle) -> circle.diameter >= 5)
       drawCircle(sketch, circle, sketch.frameCount, tree) for circle in circles
       findCollisions(circle, tree) for circle in circles
 ]
