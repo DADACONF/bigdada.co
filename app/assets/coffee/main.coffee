@@ -1,9 +1,12 @@
-dadaApp = angular.module('dada', ['sketch', 'textBufferModule'])
+dadaApp = angular.module('dada', ['sketch', 'TextBufferModule'])
 
-dadaApp.controller 'SketchController', ["$scope", "$window", "fills", "shapes", ($scope, $window, fills, shapes) =>
+dadaApp.controller 'SketchController', ["$scope", "$window", "fills", "shapes", "TextBuffer", ($scope, $window, fills, shapes, TextBuffer) =>
   GRAVITY_VECTOR = new PVector(0, -0.009)
   container = $(".canvas-container")
   canvas = $("#screen")
+  textBufferCanvas = $("#textBuffer")[0]
+  buffer = TextBuffer.createBuffer(textBufferCanvas) 
+  buffer.init()
   screen = 
     width: $(container).width()
     height: $(container).height() - 10
@@ -107,8 +110,7 @@ dadaApp.controller 'SketchController', ["$scope", "$window", "fills", "shapes", 
     sketch.background(bgRedSin(frame), g + 40, bgBlueSin(frame))  
     sketch.textSize(screen.height / 6) # 1/3 or canvas height
     sketch.fill(255 - r, g * 2/3, 255)
-    sketch.text("BIG DADA", screen.width / 22, screen.height * 4 / 6) 
-
+    # sketch.text("BIG DADA", screen.width / 22, screen.height * 4 / 6) 
   # the function that is called to bootstrap the sketch process form the processing directive
   $scope.circleAnimation = (sketch) => 
     lastFrame = 0
