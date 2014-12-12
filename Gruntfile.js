@@ -4,7 +4,7 @@ module.exports = function(grunt) {
     pkg: grunt.file.readJSON('package.json'),
     concat: {
       prod: {
-        src: ['build/js/sketch.js','build/js/main.js'],
+        src: ['build/js/textBuffer.js','build/js/sketch.js','build/js/main.js'],
         dest: 'build/js/main.js'
       }
     },

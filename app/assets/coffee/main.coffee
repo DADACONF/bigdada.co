@@ -1,4 +1,4 @@
-dadaApp = angular.module('dada', ['sketch'])
+dadaApp = angular.module('dada', ['sketch', 'textBufferModule'])
 
 dadaApp.controller 'SketchController', ["$scope", "$window", "fills", "shapes", ($scope, $window, fills, shapes) =>
   GRAVITY_VECTOR = new PVector(0, -0.009)
