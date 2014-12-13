@@ -1,6 +1,5 @@
 grunt-aws.json
 node_modules/
-bower_components/
 build/
 logs
 project/project

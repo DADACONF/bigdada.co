@@ -1,12 +1,9 @@
-dadaApp = angular.module('dada', ['sketch', 'TextBufferModule'])
+dadaApp = angular.module('dada', ['sketch'])
 
-dadaApp.controller 'SketchController', ["$scope", "$window", "fills", "shapes", "TextBuffer", ($scope, $window, fills, shapes, TextBuffer) =>
+dadaApp.controller 'SketchController', ["$scope", "$window", "fills", "shapes", ($scope, $window, fills, shapes) =>
   GRAVITY_VECTOR = new PVector(0, -0.009)
   container = $(".canvas-container")
   canvas = $("#screen")
-  textBufferCanvas = $("#textBuffer")[0]
-  buffer = TextBuffer.createBuffer(textBufferCanvas) 
-  buffer.init()
   screen = 
     width: $(container).width()
     height: $(container).height() - 10
@@ -58,10 +55,8 @@ dadaApp.controller 'SketchController', ["$scope", "$window", "fills", "shapes", 
     collisions = tree.get(left, top, width, height)
     for collision in collisions
       if(collision.circle isnt circle)
-        # console.log("collision!")
         circle.shrink()
         collision.circle.shrink()
-        #TODO reflection! 
 
   randomGravity = () ->
     seed = Math.random() * 4
@@ -73,6 +68,32 @@ dadaApp.controller 'SketchController', ["$scope", "$window", "fills", "shapes", 
       Math.PI 
     else 
       3 * (Math.PI / 2)
+
+  lastFlip = 0
+  bgSeed = Math.random()
+  bgData = null
+
+  textFlip = (sketch, frame) => 
+    bgSeed = 
+      if(frame - lastFlip > 4)
+        lastFlip = frame
+        Math.random()
+      else bgSeed  
+
+    r = (bgSeed * 50) + 205
+    g = bgSeed * 210
+    b = bgSeed * 90 
+    bgData = if bgData is null
+      sketch.background(bgRedSin(frame), g + 40, bgBlueSin(frame))  
+      sketch.textSize(screen.height / 7)
+      sketch.fill(255 - r, g * 2/3, 255)
+      sketch.text("BIG DADA", screen.width / 22, screen.height * 4 / 6) 
+      sketch.externals.context.getImageData(0, 0, screen.width, screen.height)
+    else 
+      sketch.externals.context.putImageData(bgData, 0, 0)  
+      bgData
+
+
 
   $scope.dada = ($event) =>
     newGravity = randomGravity()
@@ -91,22 +112,6 @@ dadaApp.controller 'SketchController', ["$scope", "$window", "fills", "shapes", 
     circles.push(newCircle)
     textIndex = (textIndex + 1) % 7
 
-  lastFlip = 0
-  bgSeed = Math.random()
-  textFlip = (sketch, frame) => 
-    bgSeed = 
-      if(frame - lastFlip > 4)
-        lastFlip = frame
-        Math.random()
-      else bgSeed  
-
-    r = (bgSeed * 50) + 205
-    g = bgSeed * 210
-    b = bgSeed * 90  
-    sketch.background(bgRedSin(frame), g + 40, bgBlueSin(frame))  
-    sketch.textSize(screen.height / 7)
-    sketch.fill(255 - r, g * 2/3, 255)
-    # sketch.text("BIG DADA", screen.width / 22, screen.height * 4 / 6) 
   # the function that is called to bootstrap the sketch process form the processing directive
   $scope.circleAnimation = (sketch) => 
     lastFrame = 0
@@ -117,6 +122,7 @@ dadaApp.controller 'SketchController', ["$scope", "$window", "fills", "shapes", 
         setWidthAndHeight(sketch)
       )
       sketch.frameRate(30)
+      sketch.noStroke()
     
     sketch.draw = () =>
       frameDelta = sketch.frameCount - lastFrame  
