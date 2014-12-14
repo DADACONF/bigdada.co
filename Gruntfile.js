@@ -61,6 +61,7 @@ module.exports = function(grunt) {
       dev: {
         files: [
           {expand: true, src: "app/views/**", dest: "build/", flatten: true, filter: "isFile"},  
+          {expand: true, src: "app/assets/js/*.js", dest: "build/js/", flatten: true},          
           {expand: true, src: "bower_components/bootstrap/dist/css/bootstrap.min.css", dest: "build/stylesheets/", flatten: true},
           {expand: true, src: "bower_components/bootstrap/dist/js/bootstrap.js", dest: "build/js/libs", flatten: true},
           {expand: true, src: "bower_components/jquery/dist/jquery.js", dest: "build/js/libs", flatten: true},
@@ -70,7 +71,9 @@ module.exports = function(grunt) {
         ]
       },
       prod: {
-        files: [  
+        files: [    
+          {expand: true, src: "app/views/**", dest: "build/", flatten: true, filter: "isFile"},  
+          {expand: true, src: "app/assets/js/*.js", dest: "build/js/", flatten: true},            
           {expand: true, src: "bower_components/bootstrap/dist/css/bootstrap.min.css", dest: "build/stylesheets/", flatten: true},
           {expand: true, src: "bower_components/bootstrap/dist/js/bootstrap.min.js", dest: "build/js/libs", flatten: true},
           {expand: true, src: "bower_components/jquery/dist/jquery.min.js", dest: "build/js/libs", flatten: true},

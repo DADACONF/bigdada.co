@@ -4,11 +4,15 @@ dadaApp.controller 'SketchController', ["$scope", "$window", "fills", "shapes", 
   GRAVITY_VECTOR = new PVector(0, -0.009)
   container = $(".canvas-container")
   canvas = $("#screen")
+  # bufferCanvas = $("#textBuffer")[0]
+  # textBuffer = TextBuffer.createBuffer(bufferCanvas)
+  # textBuffer.init()
   screen = 
     width: $(container).width()
     height: $(container).height() - 10
 
   text = "BIGDADA"
+  bgTexts = ["BIGDADA", "j.CREW"]
 
   circles = for i in [0..6]
     fill = new shapes.Fill(0, 0, 0)
@@ -75,19 +79,24 @@ dadaApp.controller 'SketchController', ["$scope", "$window", "fills", "shapes", 
 
   textFlip = (sketch, frame) => 
     bgSeed = 
-      if(frame - lastFlip > 4)
+      if(frame - lastFlip > 8)
         lastFlip = frame
+        bgData = null
         Math.random()
       else bgSeed  
 
     r = (bgSeed * 50) + 205
     g = bgSeed * 210
     b = bgSeed * 90 
-    bgData = if bgData is null
+    bgData = 
+    if bgData is null 
+      # sketch.background(105, 105, 105)
       sketch.background(bgRedSin(frame), g + 40, bgBlueSin(frame))  
       sketch.textSize(screen.height / 7)
-      sketch.fill(255 - r, g * 2/3, 255)
-      sketch.text("BIG DADA", screen.width / 22, screen.height * 4 / 6) 
+      # sketch.fill(255 - r, g * 2/3, 255)
+      sketch.fill(66,4,2)  
+      fillText = bgTexts[Math.floor(bgSeed * bgTexts.length)]
+      sketch.text(fillText, screen.width / 22, screen.height * 4 / 6) 
       sketch.externals.context.getImageData(0, 0, screen.width, screen.height)
     else 
       sketch.externals.context.putImageData(bgData, 0, 0)  
@@ -108,7 +117,7 @@ dadaApp.controller 'SketchController', ["$scope", "$window", "fills", "shapes", 
       clickX, 
       clickY, 
       text.slice(textIndex, textIndex+1), 
-      new PVector(0, 0))
+      new PVector(0, 0.0))
     circles.push(newCircle)
     textIndex = (textIndex + 1) % 7
 
