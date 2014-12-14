@@ -12,7 +12,25 @@ dadaApp.controller 'SketchController', ["$scope", "$window", "fills", "shapes", 
     height: $(container).height() - 10
 
   text = "BIGDADA"
-  bgTexts = ["BIGDADA", "j.CREW"]
+  aSprite = new Image()
+  aSprite.src ="sprites/a.png"
+  bSprite = new Image()
+  bSprite.src ="sprites/b.png"
+  iSprite = new Image()
+  iSprite.src ="sprites/i.png"
+  gSprite = new Image()
+  gSprite.src ="sprites/g.png"
+  dSprite = new Image()
+  dSprite.src ="sprites/d.png"
+  
+  sprites =
+    "b": bSprite
+    "i": iSprite
+    "g": gSprite
+    "d": dSprite
+    "a": aSprite  
+
+  bgTexts = ["BIGDADA", "j.CREW", "DISRUPT", "BRVNCH"]
 
   circles = for i in [0..6]
     fill = new shapes.Fill(0, 0, 0)
@@ -46,8 +64,8 @@ dadaApp.controller 'SketchController', ["$scope", "$window", "fills", "shapes", 
     sketch.fill(red, green, blue)
     sketch.ellipse(circle.x, circle.y, circle.diameter, circle.diameter)
     sketch.fill(255 - blue, 255 - green, 255.0 - red)
-    sketch.textSize(circle.diameter * .8)
-    sketch.text(circle.text, circle.x - (circle.diameter / 4), circle.y + (circle.diameter / 3))
+    # sketch.textSize(circle.diameter * .8)
+    # sketch.text(circle.text, circle.x - (circle.diameter / 4), circle.y + (circle.diameter / 3))
     tree.insert(circle.boundingRectangle())
 
   findCollisions = (circle, tree) =>
@@ -75,51 +93,52 @@ dadaApp.controller 'SketchController', ["$scope", "$window", "fills", "shapes", 
 
   lastFlip = 0
   bgSeed = Math.random()
-  bgData = null
+  colors = null
 
   textFlip = (sketch, frame) => 
-    bgSeed = 
-      if(frame - lastFlip > 8)
+    if(frame - lastFlip > 8)
+      lastFlip = frame
+      bgSeed = Math.random()
+      colors = null
+
+    colors = 
+      if colors is null
         lastFlip = frame
-        bgData = null
-        Math.random()
-      else bgSeed  
+        bgSeed = Math.random()
+        backgroundR: bgRedSin(frame)
+        backgroundG:  Math.floor(bgSeed * 210) + 40
+        backgroundB:  bgBlueSin(frame)
+        textR: 66
+        textG: 4
+        textB: 2
+      else 
+        colors  
+    sketch.background(colors.backgroundR, colors.backgroundG, colors.backgroundB)  
+    sketch.textSize(screen.height / 7)
+    sketch.fill(colors.textR, colors.textG, colors.textB)  
+    fillText = bgTexts[Math.floor(bgSeed * bgTexts.length)]
+    sketch.text(fillText, screen.width / 22, screen.height * 4 / 6) 
+     
 
-    r = (bgSeed * 50) + 205
-    g = bgSeed * 210
-    b = bgSeed * 90 
-    bgData = 
-    if bgData is null 
-      # sketch.background(105, 105, 105)
-      sketch.background(bgRedSin(frame), g + 40, bgBlueSin(frame))  
-      sketch.textSize(screen.height / 7)
-      # sketch.fill(255 - r, g * 2/3, 255)
-      sketch.fill(66,4,2)  
-      fillText = bgTexts[Math.floor(bgSeed * bgTexts.length)]
-      sketch.text(fillText, screen.width / 22, screen.height * 4 / 6) 
-      sketch.externals.context.getImageData(0, 0, screen.width, screen.height)
-    else 
-      sketch.externals.context.putImageData(bgData, 0, 0)  
-      bgData
-
-
+  addCircle = (x, y) =>
+    newCircle = new shapes.Circle(
+      70, 
+      new shapes.Fill(0,Math.random(),0), 
+      1, 
+      2, 
+      x, 
+      y, 
+      text.slice(textIndex, textIndex+1), 
+      new PVector(0, 0.0))
+    circles.push(newCircle)
+    textIndex = (textIndex + 1) % 7
 
   $scope.dada = ($event) =>
     newGravity = randomGravity()
     GRAVITY_VECTOR.set(0.009*Math.cos(newGravity), -0.009*Math.sin(newGravity)) 
     clickX = $event.offsetX
     clickY = $event.offsetY
-    newCircle = new shapes.Circle(
-      70, 
-      new shapes.Fill(0,Math.random(),0), 
-      1, 
-      2, 
-      clickX, 
-      clickY, 
-      text.slice(textIndex, textIndex+1), 
-      new PVector(0, 0.0))
-    circles.push(newCircle)
-    textIndex = (textIndex + 1) % 7
+    addCircle(clickX, clickY)
 
   # the function that is called to bootstrap the sketch process form the processing directive
   $scope.circleAnimation = (sketch) => 
@@ -143,4 +162,5 @@ dadaApp.controller 'SketchController', ["$scope", "$window", "fills", "shapes", 
       blue = blueSin(sketch.frameCount)
       drawCircle(sketch, circle, sketch.frameCount, tree, red, green, blue) for circle in circles
       findCollisions(circle, tree) for circle in circles
+      sketch.externals.context.drawImage(aSprite, 0, 0, 10, 10)
 ]
