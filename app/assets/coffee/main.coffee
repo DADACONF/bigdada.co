@@ -24,11 +24,11 @@ dadaApp.controller 'SketchController', ["$scope", "$window", "fills", "shapes", 
   dSprite.src ="sprites/d.png"
   
   sprites =
-    "b": bSprite
-    "i": iSprite
-    "g": gSprite
-    "d": dSprite
-    "a": aSprite  
+    "B": bSprite
+    "I": iSprite
+    "G": gSprite
+    "D": dSprite
+    "A": aSprite  
 
   bgTexts = ["BIGDADA", "j.CREW", "DISRUPT", "BRVNCH"]
 
@@ -41,7 +41,6 @@ dadaApp.controller 'SketchController', ["$scope", "$window", "fills", "shapes", 
   redSin = fills.colorSin(200, .34)
   greenSin = fills.colorSin(200, .14)
   blueSin = fills.colorSin(200, .22)
-
   bgRedSin = fills.colorSin(50, .35)
   bgBlueSin = fills.colorSin(120, .35)
 
@@ -64,6 +63,13 @@ dadaApp.controller 'SketchController', ["$scope", "$window", "fills", "shapes", 
     sketch.fill(red, green, blue)
     sketch.ellipse(circle.x, circle.y, circle.diameter, circle.diameter)
     sketch.fill(255 - blue, 255 - green, 255.0 - red)
+    rectangle = circle.boundingRectangle()
+    sketch.externals.context.drawImage(
+      sprites[circle.text], 
+      rectangle.left, 
+      rectangle.top, 
+      rectangle.left + rectangle.width, 
+      rectangle.top + rectangle.height)
     # sketch.textSize(circle.diameter * .8)
     # sketch.text(circle.text, circle.x - (circle.diameter / 4), circle.y + (circle.diameter / 3))
     tree.insert(circle.boundingRectangle())
@@ -100,7 +106,6 @@ dadaApp.controller 'SketchController', ["$scope", "$window", "fills", "shapes", 
       lastFlip = frame
       bgSeed = Math.random()
       colors = null
-
     colors = 
       if colors is null
         lastFlip = frame
@@ -162,5 +167,5 @@ dadaApp.controller 'SketchController', ["$scope", "$window", "fills", "shapes", 
       blue = blueSin(sketch.frameCount)
       drawCircle(sketch, circle, sketch.frameCount, tree, red, green, blue) for circle in circles
       findCollisions(circle, tree) for circle in circles
-      sketch.externals.context.drawImage(aSprite, 0, 0, 10, 10)
+
 ]
