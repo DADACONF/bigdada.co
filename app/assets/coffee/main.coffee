@@ -4,9 +4,6 @@ dadaApp.controller 'SketchController', ["$scope", "$window", "fills", "shapes", 
   GRAVITY_VECTOR = new PVector(0, -0.009)
   container = $(".canvas-container")
   canvas = $("#screen")
-  # bufferCanvas = $("#textBuffer")[0]
-  # textBuffer = TextBuffer.createBuffer(bufferCanvas)
-  # textBuffer.init()
   screen = 
     width: $(container).width()
     height: $(container).height() - 10
@@ -30,8 +27,9 @@ dadaApp.controller 'SketchController', ["$scope", "$window", "fills", "shapes", 
     "D": dSprite
     "A": aSprite  
 
-  bgTexts = ["BIGDADA", "j.CREW", "DISRUPT", "BRVNCH"]
+  bgTexts = ["BIGDADA", "j.CREW", "DISRUPT", "BRUNCH"]
 
+  circlePadding = 8
   circles = for i in [0..6]
     fill = new shapes.Fill(0, 0, 0)
     y = screen.height * .75
@@ -66,12 +64,10 @@ dadaApp.controller 'SketchController', ["$scope", "$window", "fills", "shapes", 
     rectangle = circle.boundingRectangle()
     sketch.externals.context.drawImage(
       sprites[circle.text], 
-      rectangle.left, 
-      rectangle.top, 
-      rectangle.left + rectangle.width, 
-      rectangle.top + rectangle.height)
-    # sketch.textSize(circle.diameter * .8)
-    # sketch.text(circle.text, circle.x - (circle.diameter / 4), circle.y + (circle.diameter / 3))
+      rectangle.left + circlePadding, 
+      rectangle.top + circlePadding, 
+      rectangle.width - (circlePadding * 2), 
+      rectangle.height - (circlePadding * 2))
     tree.insert(circle.boundingRectangle())
 
   findCollisions = (circle, tree) =>
@@ -122,8 +118,7 @@ dadaApp.controller 'SketchController', ["$scope", "$window", "fills", "shapes", 
     sketch.textSize(screen.height / 7)
     sketch.fill(colors.textR, colors.textG, colors.textB)  
     fillText = bgTexts[Math.floor(bgSeed * bgTexts.length)]
-    sketch.text(fillText, screen.width / 22, screen.height * 4 / 6) 
-     
+    sketch.text(fillText, screen.width / 18, screen.height * 4 / 6) 
 
   addCircle = (x, y) =>
     newCircle = new shapes.Circle(
@@ -138,12 +133,19 @@ dadaApp.controller 'SketchController', ["$scope", "$window", "fills", "shapes", 
     circles.push(newCircle)
     textIndex = (textIndex + 1) % 7
 
-  $scope.dada = ($event) =>
-    newGravity = randomGravity()
-    GRAVITY_VECTOR.set(0.009*Math.cos(newGravity), -0.009*Math.sin(newGravity)) 
-    clickX = $event.offsetX
-    clickY = $event.offsetY
-    addCircle(clickX, clickY)
+  circleStream = false
+  circleX = 0
+  circleY = 0
+  
+  $scope.streamOn = () => 
+    circleStream = true  
+
+  $scope.streamOff = () => 
+    circleStream = false
+
+  $scope.streamMove = ($event) =>
+    circleX = $event.offsetX
+    circleY = $event.offsetY
 
   # the function that is called to bootstrap the sketch process form the processing directive
   $scope.circleAnimation = (sketch) => 
@@ -162,6 +164,11 @@ dadaApp.controller 'SketchController', ["$scope", "$window", "fills", "shapes", 
       tree.reset()
       textFlip(sketch, frameDelta)
       circles = circles.filter((circle) -> circle.diameter >= 10)
+      if circleStream is true
+        newGravity = randomGravity()  
+        GRAVITY_VECTOR.set(0.009*Math.cos(newGravity), -0.009*Math.sin(newGravity)) 
+        addCircle(circleX, circleY)
+
       red = redSin(sketch.frameCount)
       green = greenSin(sketch.frameCount)
       blue = blueSin(sketch.frameCount)

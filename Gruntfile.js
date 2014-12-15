@@ -67,6 +67,7 @@ module.exports = function(grunt) {
           {expand: true, src: "bower_components/bootstrap/dist/js/bootstrap.js", dest: "build/js/libs", flatten: true},
           {expand: true, src: "bower_components/jquery/dist/jquery.js", dest: "build/js/libs", flatten: true},
           {expand: true, src: "bower_components/angular/angular.js", dest: "build/js/libs", flatten: true},
+          {expand: true, src: "bower_components/angular/angular-touch.js", dest: "build/js/libs", flatten: true},
           {expand: true, src: "bower_components/processing/processing.js", dest: "build/js/libs", flatten: true},
           {expand: true, src: "bower_components/giant-quadtree/dist/GiantQuadtree.js", dest: "build/js/libs", flatten: true}
         ]
@@ -80,6 +81,7 @@ module.exports = function(grunt) {
           {expand: true, src: "bower_components/bootstrap/dist/js/bootstrap.min.js", dest: "build/js/libs", flatten: true},
           {expand: true, src: "bower_components/jquery/dist/jquery.min.js", dest: "build/js/libs", flatten: true},
           {expand: true, src: "bower_components/angular/angular.min.js", dest: "build/js/libs", flatten: true},
+          {expand: true, src: "bower_components/angular/angular-touch.js", dest: "build/js/libs", flatten: true},
           {expand: true, src: "bower_components/processing/processing.min.js", dest: "build/js/libs", flatten: true},
           {expand: true, src: "bower_components/giant-quadtree/dist/GiantQuadtree.min.js", dest: "build/js/libs", flatten: true}
         ]
@@ -105,6 +107,9 @@ module.exports = function(grunt) {
           },
           { from: "js/libs/angular.js",
             to: "js/libs/angular.min.js"
+          },
+          { from: "js/libs/angular-touch.js",
+            to: "js/libs/angular-touch.min.js"
           },
           { from: "js/libs/bootstrap.js",
             to: "js/libs/bootstrap.min.js"
@@ -136,6 +141,10 @@ module.exports = function(grunt) {
           {
             src: 'build/js/*.min.js',
             dest: 'js/'
+          },
+          {
+            src: 'build/sprites/*.png',
+            dest: 'sprites/'
           },
           {
             src: 'build/js/libs/*.min.js',
