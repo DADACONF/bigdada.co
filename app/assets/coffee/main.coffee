@@ -6,7 +6,7 @@ dadaApp.controller 'SketchController', ["$scope", "$window", "$swipe", "fills", 
   canvas = $("#screen")
   screen = 
     width: $(container).width()
-    height: $(container).height() - 10
+    height: $(container).height()
 
   text = "BIGDADA"
   aSprite = new Image()
@@ -46,7 +46,7 @@ dadaApp.controller 'SketchController', ["$scope", "$window", "$swipe", "fills", 
 
   setWidthAndHeight = (sketch) =>
     screen.width = $(container).width()
-    screen.height = $(container).height() - 10
+    screen.height = $(container).height()
     canvas.attr('width', screen.width)
     canvas.attr('height', screen.height)
     sketch.size(screen.width, screen.height)    
@@ -88,6 +88,7 @@ dadaApp.controller 'SketchController', ["$scope", "$window", "$swipe", "fills", 
     if(frame - lastFlip > 12)
       lastFlip = frame
       bgSeed = Math.random()
+      console.log(colors)
       colors = null
     colors = 
       if colors is null
@@ -96,9 +97,9 @@ dadaApp.controller 'SketchController', ["$scope", "$window", "$swipe", "fills", 
         backgroundR: bgRedSin(frame)
         backgroundG:  Math.floor(bgSeed * 210) + 40
         backgroundB:  bgBlueSin(frame)
-        textR: 66
-        textG: 4
-        textB: 2
+        textR: 0x14
+        textG: 0x07
+        textB: 0x3A
       else 
         colors  
     sketch.background(colors.backgroundR, colors.backgroundG, colors.backgroundB)  
