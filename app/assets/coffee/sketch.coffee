@@ -56,6 +56,7 @@ sketch.factory('shapes', () =>
           @velocityVector.rotate(-1.0 * (Math.PI + 2 * incidence))
           @velocityVector.mult(BOUNCE_DECAY)
 
+
       @x = sketch.constrain(newX, xLeftbound, xRightbound)
       @y = sketch.constrain(newY, yUpperbound, yLowerbound)
 
@@ -73,7 +74,7 @@ sketch.factory('shapes', () =>
       this.move(time, sketch)
 
     shrink: () =>
-      @diameter = .99 * @diameter
+      @diameter = .98 * @diameter
 
   shapes = 
   	Circle: Circle

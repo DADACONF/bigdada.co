@@ -66,7 +66,8 @@ dadaApp.controller 'SketchController', ["$scope", "$window", "$swipe", "fills", 
       rectangle.top + circlePadding, 
       rectangle.width - (circlePadding * 2), 
       rectangle.height - (circlePadding * 2))
-    circle.shrink()
+    if(frame - lastFlip > 10)
+      circle.shrink()
 
   randomGravity = () ->
     seed = Math.random() * 4
@@ -84,7 +85,7 @@ dadaApp.controller 'SketchController', ["$scope", "$window", "$swipe", "fills", 
   colors = null
 
   textFlip = (sketch, frame) => 
-    if(frame - lastFlip > 8)
+    if(frame - lastFlip > 12)
       lastFlip = frame
       bgSeed = Math.random()
       colors = null
@@ -106,7 +107,9 @@ dadaApp.controller 'SketchController', ["$scope", "$window", "$swipe", "fills", 
     fillText = bgTexts[Math.floor(bgSeed * bgTexts.length)]
     sketch.text(fillText, 10, screen.height * 4 / 6) 
 
-  addCircle = (x, y) =>
+  addCircle = (x, y, direction, magnitude) =>
+    xComponent = Math.cos(direction) * magnitude
+    yComponent = Math.sin(direction) * magnitude
     newCircle = new shapes.Circle(
       70, 
       new shapes.Fill(0,Math.random(),0), 
@@ -115,7 +118,7 @@ dadaApp.controller 'SketchController', ["$scope", "$window", "$swipe", "fills", 
       x, 
       y, 
       text.slice(textIndex, textIndex+1), 
-      new PVector(0, 0.0))
+      new PVector(xComponent, yComponent))
     circles.push(newCircle)
     textIndex = (textIndex + 1) % 7
 
@@ -156,7 +159,8 @@ dadaApp.controller 'SketchController', ["$scope", "$window", "$swipe", "fills", 
       if circleStream is true
         newGravity = randomGravity()  
         GRAVITY_VECTOR.set(0.009*Math.cos(newGravity), -0.009*Math.sin(newGravity)) 
-        addCircle(circleX, circleY)
+        circleSeed = Math.random()
+        addCircle(circleX, circleY, circleSeed * 2 * Math.PI, circleSeed * 2.4)
 
       red = redSin(sketch.frameCount)
       green = greenSin(sketch.frameCount)
