@@ -1,6 +1,6 @@
-dadaApp = angular.module('dada', ['sketch'])
+dadaApp = angular.module('dada', ['sketch', 'ngTouch'])
 
-dadaApp.controller 'SketchController', ["$scope", "$window", "fills", "shapes", ($scope, $window, fills, shapes) =>
+dadaApp.controller 'SketchController', ["$scope", "$window", "$swipe", "fills", "shapes", ($scope, $window, $swipe, fills, shapes) =>
   GRAVITY_VECTOR = new PVector(0, -0.009)
   container = $(".canvas-container")
   canvas = $("#screen")
@@ -42,8 +42,6 @@ dadaApp.controller 'SketchController', ["$scope", "$window", "fills", "shapes", 
   bgRedSin = fills.colorSin(50, .35)
   bgBlueSin = fills.colorSin(120, .35)
 
-  tree = GiantQuadtree.create(screen.width, screen.height)
-
   textIndex = 0
 
   setWidthAndHeight = (sketch) =>
@@ -54,7 +52,7 @@ dadaApp.controller 'SketchController', ["$scope", "$window", "fills", "shapes", 
     sketch.size(screen.width, screen.height)    
 
 
-  drawCircle = (sketch, circle, frame, tree, red, green, blue) =>
+  drawCircle = (sketch, circle, frame, red, green, blue) =>
     circle.impulse(GRAVITY_VECTOR, 10, sketch)
     sketch.strokeWeight(circle.weight)
     sketch.stroke(circle.stroke)
@@ -68,19 +66,7 @@ dadaApp.controller 'SketchController', ["$scope", "$window", "fills", "shapes", 
       rectangle.top + circlePadding, 
       rectangle.width - (circlePadding * 2), 
       rectangle.height - (circlePadding * 2))
-    tree.insert(circle.boundingRectangle())
-
-  findCollisions = (circle, tree) =>
-    rect = circle.boundingRectangle()
-    left = rect.left
-    top = rect.top
-    width = rect.width 
-    height = rect.height 
-    collisions = tree.get(left, top, width, height)
-    for collision in collisions
-      if(collision.circle isnt circle)
-        circle.shrink()
-        collision.circle.shrink()
+    circle.shrink()
 
   randomGravity = () ->
     seed = Math.random() * 4
@@ -115,10 +101,10 @@ dadaApp.controller 'SketchController', ["$scope", "$window", "fills", "shapes", 
       else 
         colors  
     sketch.background(colors.backgroundR, colors.backgroundG, colors.backgroundB)  
-    sketch.textSize(screen.height / 7)
+    sketch.textSize(screen.width / 7)
     sketch.fill(colors.textR, colors.textG, colors.textB)  
     fillText = bgTexts[Math.floor(bgSeed * bgTexts.length)]
-    sketch.text(fillText, screen.width / 18, screen.height * 4 / 6) 
+    sketch.text(fillText, 10, screen.height * 4 / 6) 
 
   addCircle = (x, y) =>
     newCircle = new shapes.Circle(
@@ -136,16 +122,20 @@ dadaApp.controller 'SketchController', ["$scope", "$window", "fills", "shapes", 
   circleStream = false
   circleX = 0
   circleY = 0
-  
-  $scope.streamOn = () => 
-    circleStream = true  
 
-  $scope.streamOff = () => 
-    circleStream = false
-
-  $scope.streamMove = ($event) =>
-    circleX = $event.offsetX
-    circleY = $event.offsetY
+  $swipe.bind(canvas, 
+    start: (coords) => 
+      circleStream = true  
+      circleX = coords.x
+      circleY = coords.y
+    end:  (coords) => 
+      circleStream = false
+    move: (coords) =>
+      circleX = coords.x
+      circleY = coords.y
+    cancel: () =>
+      circleStream = false  
+  )    
 
   # the function that is called to bootstrap the sketch process form the processing directive
   $scope.circleAnimation = (sketch) => 
@@ -161,7 +151,6 @@ dadaApp.controller 'SketchController', ["$scope", "$window", "fills", "shapes", 
     
     sketch.draw = () =>
       frameDelta = sketch.frameCount - lastFrame  
-      tree.reset()
       textFlip(sketch, frameDelta)
       circles = circles.filter((circle) -> circle.diameter >= 10)
       if circleStream is true
@@ -172,7 +161,5 @@ dadaApp.controller 'SketchController', ["$scope", "$window", "fills", "shapes", 
       red = redSin(sketch.frameCount)
       green = greenSin(sketch.frameCount)
       blue = blueSin(sketch.frameCount)
-      drawCircle(sketch, circle, sketch.frameCount, tree, red, green, blue) for circle in circles
-      findCollisions(circle, tree) for circle in circles
-
+      drawCircle(sketch, circle, sketch.frameCount, red, green, blue) for circle in circles
 ]

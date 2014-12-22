@@ -1,33 +1,31 @@
-.sig-headline-container {
-	text-align: center;
-	.sig-headline {
-		font-family: "Courier New", Courier, monospace;
-	}	
+
+@import "../../../bower_components/bootstrap/less/bootstrap.less";
+/** Define all bootstrap overrides in the follwowing files. Do not touch bootstrap source. **/
+@import "custom-variables.less";
+
+.canvas-row {
+	height: 40%;
 }
 
-body {
-	background: rgb(220, 220, 220);
-}
-
-html, body {
-	height: 100%;
-}
-
-.site-wrapper {
-	height: 100%;
-	background: repeating-linear-gradient(to top, #696969 20%, #420420, #696969);
-}
-
-.container, .row {
-	height: 100%;
-}
 .canvas-container {
-	padding: 15px 0 5px 0;
-  height: 80%;	
+	padding: 0px 0 5px 0;
+  height: 100%;	
+  canvas {
+	  border-top: 1px solid #420420;
+	  box-shadow: 0px 10px 5px 2px rgba(25,25,25	,0.75);  	
+  }
 }
 
+.manifesto {
+	padding-top: 5px;
+	box-shadow: inset 0px -10px 5px 0px rgba(0,0,0,0.75);
+}
+
+.headline {
+	text-align: center;
+}
 canvas {
 	cursor: pointer;
 	padding: 0;
-	border: 3px solid rgb(50, 50, 50);
+	/*border: 3px solid rgb(50, 50, 50);*/
 }	

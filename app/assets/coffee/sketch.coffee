@@ -27,7 +27,7 @@ sketch.factory('fills', () =>
 sketch.factory('shapes', () =>  
 	HORIZONTAL = new PVector(-1.0,0)
 	VERTICAL = new PVector(0,1)
-	PADDING = 1
+	PADDING = 3
 	BOUNCE_DECAY = 0.65
 
 	class Fill

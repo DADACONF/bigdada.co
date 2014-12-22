@@ -63,13 +63,11 @@ module.exports = function(grunt) {
           {expand: true, src: "app/views/**", dest: "build/", flatten: true, filter: "isFile"},  
           {expand: true, src: "app/assets/js/*.js", dest: "build/js/", flatten: true},          
           {expand: true, src: "app/assets/sprites/*.png", dest: "build/sprites/", flatten: true},          
-          {expand: true, src: "bower_components/bootstrap/dist/css/bootstrap.min.css", dest: "build/stylesheets/", flatten: true},
           {expand: true, src: "bower_components/bootstrap/dist/js/bootstrap.js", dest: "build/js/libs", flatten: true},
           {expand: true, src: "bower_components/jquery/dist/jquery.js", dest: "build/js/libs", flatten: true},
           {expand: true, src: "bower_components/angular/angular.js", dest: "build/js/libs", flatten: true},
-          {expand: true, src: "bower_components/angular/angular-touch.js", dest: "build/js/libs", flatten: true},
-          {expand: true, src: "bower_components/processing/processing.js", dest: "build/js/libs", flatten: true},
-          {expand: true, src: "bower_components/giant-quadtree/dist/GiantQuadtree.js", dest: "build/js/libs", flatten: true}
+          {expand: true, src: "bower_components/angular-touch/angular-touch.js", dest: "build/js/libs", flatten: true},
+          {expand: true, src: "bower_components/processing/processing.js", dest: "build/js/libs", flatten: true}
         ]
       },
       prod: {
@@ -77,13 +75,11 @@ module.exports = function(grunt) {
           {expand: true, src: "app/views/**", dest: "build/", flatten: true, filter: "isFile"},  
           {expand: true, src: "app/assets/js/*.js", dest: "build/js/", flatten: true},      
           {expand: true, src: "app/assets/sprites/*.png", dest: "build/sprites/", flatten: true},                
-          {expand: true, src: "bower_components/bootstrap/dist/css/bootstrap.min.css", dest: "build/stylesheets/", flatten: true},
           {expand: true, src: "bower_components/bootstrap/dist/js/bootstrap.min.js", dest: "build/js/libs", flatten: true},
           {expand: true, src: "bower_components/jquery/dist/jquery.min.js", dest: "build/js/libs", flatten: true},
           {expand: true, src: "bower_components/angular/angular.min.js", dest: "build/js/libs", flatten: true},
-          {expand: true, src: "bower_components/angular/angular-touch.js", dest: "build/js/libs", flatten: true},
-          {expand: true, src: "bower_components/processing/processing.min.js", dest: "build/js/libs", flatten: true},
-          {expand: true, src: "bower_components/giant-quadtree/dist/GiantQuadtree.min.js", dest: "build/js/libs", flatten: true}
+          {expand: true, src: "bower_components/angular-touch/angular-touch.min.js", dest: "build/js/libs", flatten: true},
+          {expand: true, src: "bower_components/processing/processing.min.js", dest: "build/js/libs", flatten: true}
         ]
       }
     },
@@ -116,9 +112,6 @@ module.exports = function(grunt) {
           },
           { from: "js/libs/processing.js",
             to: "js/libs/processing.min.js"
-          },
-          { from: "js/libs/GiantQuadtree.js",
-            to: "js/libs/GiantQuadtree.min.js"
           }
         ]
       }
@@ -159,7 +152,7 @@ module.exports = function(grunt) {
     },
     watch: {
       coffee: {
-        files: ['app/assets/coffee/*.coffee', 'app/assets/stylesheets/*.less'],
+        files: ['app/assets/coffee/*.coffee', 'app/assets/stylesheets/*.less', 'app/assets/js/*.js', 'app/views/*.html'],
         tasks: ['dev']    
       }
     }
