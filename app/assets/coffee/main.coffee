@@ -88,7 +88,6 @@ dadaApp.controller 'SketchController', ["$scope", "$window", "$swipe", "fills", 
     if(frame - lastFlip > 12)
       lastFlip = frame
       bgSeed = Math.random()
-      console.log(colors)
       colors = null
     colors = 
       if colors is null
